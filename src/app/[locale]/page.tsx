@@ -2,7 +2,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Link } from "@/i18n/navigation";
 
-// Page provisoire de la phase 0 : vérifie polices, couleurs, mode sombre et langues.
+// Page provisoire de la phase 0, remplacée à la phase 1.
 export default function Home() {
   const t = useTranslations("home");
   const otherLocale = useLocale() === "fr" ? "en" : "fr";

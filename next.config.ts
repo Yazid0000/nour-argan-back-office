@@ -5,10 +5,10 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   reactCompiler: true,
   turbopack: {
-    // Un package-lock.json traîne dans le dossier utilisateur : on fixe la racine au projet.
+    // Un package-lock.json traîne dans le dossier utilisateur et tromperait Turbopack.
     root: process.cwd(),
-    // Ce que fait le plugin de next-intl, sans lui : son chargement exige @swc/core,
-    // dont le binaire natif refuse de démarrer sur ce Windows (vérif. de droits du cache).
+    // Remplace le plugin de next-intl, qui charge @swc/core. Ce binaire refuse de démarrer
+    // sur ce Windows à cause d'une vérification des droits de son cache.
     resolveAlias: { "next-intl/config": "./src/i18n/request.ts" },
     rules: {
       "*.css": {

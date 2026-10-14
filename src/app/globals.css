@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* `dark:` suit la classe .dark posée sur <html> (et plus le réglage système seul). */
+/* `dark:` suit la classe .dark posée sur <html>, pas seulement le réglage système. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Couleurs de la maquette. Le mode sombre ne fait que redéfinir ces variables. */
@@ -52,7 +52,7 @@
   --track: #262b2f;
 }
 
-/* Expose les variables à Tailwind : bg-surface, text-text-2, border-border, bg-accent… */
+/* Donne les classes Tailwind bg-surface, text-text-2, border-border, bg-accent, etc. */
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
@@ -84,7 +84,7 @@ body {
   @apply bg-bg text-text font-sans antialiased;
 }
 
-/* Prix, quantités, numéros : chiffres alignés. */
+/* Les prix, quantités et numéros restent alignés en colonne. */
 .font-mono {
   font-variant-numeric: tabular-nums;
 }
