@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+/* `dark:` suit la classe .dark posée sur <html> (et plus le réglage système seul). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Couleurs de la maquette. Le mode sombre ne fait que redéfinir ces variables. */
+:root {
+  color-scheme: light;
+  --bg: #f5f5f2;
+  --surface: #ffffff;
+  --border: #e4e3de;
+  --text: #16181d;
+  --text-2: #5d6270;
+  --accent: #0f5e63;
+  --accent-fg: #ffffff;
+  --accent-soft: #e4efef;
+  --ok-bg: #e2f0e5;
+  --ok-fg: #1d6a33;
+  --warn-bg: #faefd8;
+  --warn-fg: #7e4e00;
+  --err-bg: #fae7e5;
+  --err-fg: #b3261e;
+  --neutral-bg: #ecece8;
+  --neutral-fg: #4e535e;
+  --gauge-amber: #a86f05;
+  --gauge-red: #b3261e;
+  --skeleton: #ecebe6;
+  --track: #ecebe6;
+}
+
+.dark {
+  color-scheme: dark;
+  --bg: #0f1214;
+  --surface: #171b1e;
+  --border: #2a3034;
+  --text: #ecebe7;
+  --text-2: #a3a8b1;
+  --accent: #5cc4c0;
+  --accent-fg: #0f1214;
+  --accent-soft: #163537;
+  --ok-bg: #15301e;
+  --ok-fg: #86d6a0;
+  --warn-bg: #35290f;
+  --warn-fg: #f0c26a;
+  --err-bg: #3b1815;
+  --err-fg: #ff9f96;
+  --neutral-bg: #262b2f;
+  --neutral-fg: #b8bcc4;
+  --gauge-amber: #e3a93c;
+  --gauge-red: #f2766c;
+  --skeleton: #22282b;
+  --track: #262b2f;
+}
+
+/* Expose les variables à Tailwind : bg-surface, text-text-2, border-border, bg-accent… */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-text-2: var(--text-2);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-ok-bg: var(--ok-bg);
+  --color-ok-fg: var(--ok-fg);
+  --color-warn-bg: var(--warn-bg);
+  --color-warn-fg: var(--warn-fg);
+  --color-err-bg: var(--err-bg);
+  --color-err-fg: var(--err-fg);
+  --color-neutral-bg: var(--neutral-bg);
+  --color-neutral-fg: var(--neutral-fg);
+  --color-gauge-amber: var(--gauge-amber);
+  --color-gauge-red: var(--gauge-red);
+  --color-skeleton: var(--skeleton);
+  --color-track: var(--track);
+
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-schibsted), var(--font-geist), sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+body {
+  @apply bg-bg text-text font-sans antialiased;
+}
+
+/* Prix, quantités, numéros : chiffres alignés. */
+.font-mono {
+  font-variant-numeric: tabular-nums;
+}

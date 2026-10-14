@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "title": "Nour Argan, back-office",
+    "description": "Le back-office d'une boutique en ligne, projet démo."
+  },
+  "theme": {
+    "toggle": "Clair / sombre"
+  },
+  "home": {
+    "title": "Mise en place terminée",
+    "intro": "Polices, couleurs, mode sombre et langues sont branchés. Les vrais écrans arrivent à la phase 1.",
+    "sample": "Commande n° 1042",
+    "delivered": "Livrée",
+    "toConfirm": "À confirmer",
+    "outOfStock": "Rupture",
+    "cancelled": "Annulée",
+    "primary": "Confirmer",
+    "switchLanguage": "English"
+  }
+}

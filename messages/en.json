@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "title": "Nour Argan, back office",
+    "description": "The back office of an online shop, demo project."
+  },
+  "theme": {
+    "toggle": "Light / dark"
+  },
+  "home": {
+    "title": "Setup done",
+    "intro": "Fonts, colours, dark mode and languages are wired up. The real screens come in phase 1.",
+    "sample": "Order #1042",
+    "delivered": "Delivered",
+    "toConfirm": "To confirm",
+    "outOfStock": "Out of stock",
+    "cancelled": "Cancelled",
+    "primary": "Confirm",
+    "switchLanguage": "Français"
+  }
+}
