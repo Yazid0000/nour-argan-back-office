@@ -4,6 +4,13 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   reactCompiler: true,
+  // Pas de page d'accueil : on arrive directement sur la connexion, dans la bonne langue.
+  async redirects() {
+    return [
+      { source: "/", destination: "/connexion", permanent: false },
+      { source: "/en", destination: "/en/connexion", permanent: false },
+    ];
+  },
   turbopack: {
     // Un package-lock.json traîne dans le dossier utilisateur et tromperait Turbopack.
     root: process.cwd(),

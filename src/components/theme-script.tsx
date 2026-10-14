@@ -3,7 +3,7 @@
 import { useLayoutEffect } from "react";
 
 // localStorage.theme vaut "light", "dark", ou rien pour suivre le système.
-function applyTheme() {
+export function applyTheme() {
   try {
     const t = localStorage.theme;
     document.documentElement.classList.toggle(
