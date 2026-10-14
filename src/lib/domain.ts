@@ -3,7 +3,8 @@
 
 /** Montant en centimes (1 MAD = 100), pour ne jamais arrondir de travers. */
 export type Cents = number;
-export type Currency = "MAD" | "EUR";
+export const currencies = ["MAD", "EUR"] as const;
+export type Currency = (typeof currencies)[number];
 
 export const categories = ["oils", "hammam", "face", "hair", "gifts"] as const;
 export type Category = (typeof categories)[number];
@@ -41,12 +42,16 @@ export type Customer = {
   address: string;
   city: string;
   postalCode: string;
-  country: "MA" | "FR" | "BE";
+  country: Country;
   note: string | null;
   createdAt: Date;
 };
 
-export type Payment = "cod" | "card" | "transfer";
+export const countries = ["MA", "FR", "BE"] as const;
+export type Country = (typeof countries)[number];
+
+export const payments = ["cod", "card", "transfer"] as const;
+export type Payment = (typeof payments)[number];
 
 export type OrderLine = {
   productId: string;
@@ -103,12 +108,16 @@ export const orderTabs = {
 } as const satisfies Record<string, readonly Status[]>;
 export type OrderTab = keyof typeof orderTabs;
 
-export type Actor = "site" | "salma" | "youssef" | "courier";
+export const actors = ["site", "salma", "youssef", "courier"] as const;
+export type Actor = (typeof actors)[number];
+
+export const historyKinds = [...statuses, "callNoAnswer", "noteAdded"] as const;
+export type HistoryKind = (typeof historyKinds)[number];
 
 export type HistoryEvent = {
   at: Date;
   actor: Actor;
-  kind: Status | "callNoAnswer" | "noteAdded";
+  kind: HistoryKind;
 };
 
 export type Order = {

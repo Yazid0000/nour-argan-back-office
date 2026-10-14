@@ -2,7 +2,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { CaretLeftIcon, MagnifyingGlassIcon, PhoneIcon, UsersIcon, WhatsappLogoIcon, XIcon } from "@phosphor-icons/react/ssr";
 import { Link } from "@/i18n/navigation";
 import { type CustomerFilter, getCustomer, listCustomers } from "@/lib/data";
-import { type Segment, total } from "@/lib/domain";
+import type { Segment } from "@/lib/domain";
 import { formatDay, formatWhen, moneyParts } from "@/lib/format";
 import { ActionBar, Chip, EmptyState, Money, Pill, StatusPill, type Tone, buttonStyles, cx, inputStyles } from "./ui";
 
@@ -91,11 +91,11 @@ export async function CustomersScreen({ segment, q = "", selectedId }: { segment
                           </Link>
                           <p className="truncate font-mono text-xs text-text-2">
                             <span className="font-sans">{r.customer.city}</span>
-                            <span className="lg:hidden"> · {t("orders", { count: r.orders.length })}</span>
+                            <span className="lg:hidden"> · {t("orders", { count: r.orderCount })}</span>
                           </p>
                         </div>
                       </div>
-                      <span className="hidden text-right font-mono text-sm lg:block">{r.orders.length}</span>
+                      <span className="hidden text-right font-mono text-sm lg:block">{r.orderCount}</span>
                       <div className="flex flex-col items-end gap-1 lg:block lg:text-right">
                         <Money cents={r.total} className="text-sm" />
                         <span className="lg:hidden">
@@ -199,7 +199,7 @@ export async function CustomerDetail({ id, backHref }: { id: string; backHref: s
                   <p className="font-mono text-xs text-text-2">{formatWhen(o.createdAt, d.now, locale, { today: common("today"), yesterday: common("yesterday") }, false)}</p>
                 </div>
                 <StatusPill status={o.status} />
-                <Money cents={total(o)} currency={o.currency} className="w-20 text-right text-sm" />
+                <Money cents={o.total} currency={o.currency} className="w-20 text-right text-sm" />
               </li>
             ))}
           </ul>

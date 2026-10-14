@@ -12,8 +12,8 @@ import {
   WhatsappLogoIcon,
 } from "@phosphor-icons/react/ssr";
 import { Link } from "@/i18n/navigation";
-import { getOrder, listOrders } from "@/lib/data";
-import { type OrderTab, type Payment, orderTabs, railSteps, subtotal, transitions } from "@/lib/domain";
+import { ORDERS_LIMIT, getOrder, listOrders, oldestFirst } from "@/lib/data";
+import { type OrderTab, type Payment, orderTabs, payments, railSteps, subtotal, transitions } from "@/lib/domain";
 import { dayKey, formatMoney, formatTime, formatWhen } from "@/lib/format";
 import { AutoSubmitSelect } from "./auto-submit-select";
 import { ActionBar, EmptyState, Money, StatusPill, Swatch, buttonStyles, cx, inputStyles } from "./ui";
@@ -65,14 +65,13 @@ export async function OrdersScreen({
       <label className="sr-only" htmlFor="payment">{t("paymentFilter")}</label>
       <AutoSubmitSelect id="payment" name="payment" defaultValue={payment ?? ""} className={cx(inputStyles, "w-auto max-w-36 pr-2 text-sm")}>
         <option value="">{t("allPayments")}</option>
-        {(["cod", "card", "transfer"] as const).map((p) => (
+        {payments.map((p) => (
           <option key={p} value={p}>{pay(p)}</option>
         ))}
       </AutoSubmitSelect>
     </form>
   );
 
-  const oldestFirst = tab === "toConfirm" || tab === "toPrepare";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -112,7 +111,7 @@ export async function OrdersScreen({
             )
           ) : (
             <>
-              <p className="px-5 pt-3 pb-2 text-xs text-text-2 lg:hidden">{oldestFirst ? t("oldestFirst") : t("newestFirst")}</p>
+              <p className="px-5 pt-3 pb-2 text-xs text-text-2 lg:hidden">{oldestFirst(tab) ? t("oldestFirst") : t("newestFirst")}</p>
 
               <ul className="flex flex-col gap-2.5 px-4 pb-6 lg:hidden">
                 {rows.map((o) => {
@@ -186,7 +185,7 @@ export async function OrdersScreen({
                   </tbody>
                 </table>
               </div>
-              {rows.length === 50 && <p className="px-5 pb-6 text-xs text-text-2 lg:px-0 lg:pt-3">{t("limited")}</p>}
+              {rows.length === ORDERS_LIMIT && <p className="px-5 pb-6 text-xs text-text-2 lg:px-0 lg:pt-3">{t("limited")}</p>}
             </>
           )}
         </div>
@@ -386,7 +385,6 @@ export async function OrderDetail({ id, backHref }: { id: string; backHref: stri
   );
 }
 
-const payments: Payment[] = ["cod", "card", "transfer"];
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 
 /** Lit l'adresse sans lui faire confiance. Un onglet inconnu redevient « À confirmer ». */

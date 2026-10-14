@@ -1,0 +1,2 @@
+# Fins de ligne LF partout, pour que Git arrête de prévenir à chaque commit sous Windows.
+* text=auto eol=lf

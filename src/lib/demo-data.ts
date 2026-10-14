@@ -14,7 +14,7 @@ import { subtotal } from "./domain";
 
 // Données inventées, mais toujours les mêmes, car le hasard part d'une graine fixe.
 // Les dates sont relatives à aujourd'hui, pour que la démo ait toujours des commandes du jour.
-// La phase 2 réutilisera ce générateur pour remplir la base (seed).
+// Le script src/db/seed.ts s'en sert pour remplir la base.
 
 function mulberry32(seed: number) {
   return () => {
@@ -158,7 +158,7 @@ const FREE_SHIPPING_MAD = 50000;
 const DAY = 86_400_000;
 const HOUR = 3_600_000;
 
-function generate(now: Date) {
+export function generateDemo(now: Date) {
   const rand = mulberry32(42);
   const pick = <T,>(items: readonly T[]) => items[Math.floor(rand() * items.length)];
   const weighted = <T,>(items: readonly T[], weight: (t: T) => number) => {
@@ -304,12 +304,3 @@ export const settings = {
   ],
   notifications: { newOrder: true, lowStock: true, dailySummary: false },
 };
-
-// Régénéré une fois par jour, pour que « aujourd'hui » reste aujourd'hui.
-let cache: { day: string; data: ReturnType<typeof generate> } | null = null;
-
-export function demoData(now = new Date()) {
-  const day = now.toDateString();
-  if (cache?.day !== day) cache = { day, data: generate(now) };
-  return cache.data;
-}
