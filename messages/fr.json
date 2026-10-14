@@ -119,7 +119,13 @@
     "show": "Afficher",
     "hide": "Masquer",
     "asManager": "Entrer comme gérante",
-    "asPreparer": "Entrer comme préparateur"
+    "asPreparer": "Entrer comme préparateur",
+    "signIn": "Se connecter",
+    "emailPlaceholder": "toi@nourargan.ma",
+    "errorInvalid": "Mot de passe incorrect. Vérifie les majuscules et réessaie.",
+    "errorMissing": "Indique ton e-mail et ton mot de passe.",
+    "errorTooMany": "Trop d'essais. Attends une minute et réessaie.",
+    "errorDemo": "La démo n'est pas prête pour le moment. Réessaie dans un instant."
   },
   "today": {
     "hello": "Bonjour {name}",
@@ -212,7 +218,13 @@
     "emptyBody": "Les prochains colis apparaîtront ici dès que Salma confirmera une commande.",
     "preparedToday": "Préparés aujourd'hui",
     "itemsPacked": "Articles emballés",
-    "refresh": "Actualiser"
+    "refresh": "Actualiser",
+    "views": "Vues",
+    "tabToPack": "À préparer",
+    "tabShipped": "Expédiées",
+    "items": "{count, plural, one {# article} other {# articles}}",
+    "shippedWhen": "Expédiée {when}",
+    "emptyShipped": "Aucun colis en route pour l'instant."
   },
   "products": {
     "title": "Produits",
@@ -378,6 +390,9 @@
     "errorBody": "Une erreur s'est glissée en chargeant cette page. Réessaie, et si ça continue, recharge l'application.",
     "retry": "Réessayer",
     "notFound": "Cette page n'existe pas.",
-    "notFoundLink": "Retour à Aujourd'hui"
+    "notFoundLink": "Retour à Aujourd'hui",
+    "forbiddenTitle": "Cette page est réservée à la gérante.",
+    "forbiddenBody": "Ton compte de préparateur donne accès aux colis à préparer et à expédier.",
+    "forbiddenLink": "Aller aux colis"
   }
 }

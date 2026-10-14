@@ -17,7 +17,8 @@ import {
 } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "next-intl";
-import { type TodoItem, getToday, teamMember } from "@/lib/data";
+import { type TodoItem, getToday } from "@/lib/data";
+import { getCurrentUser } from "@/lib/session";
 import { dayKey, formatMoney, TIME_ZONE } from "@/lib/format";
 
 /** "Khadija Benali" devient "Khadija B.". */
@@ -27,8 +28,9 @@ const shortName = (name: string) => {
 };
 
 export default async function TodayPage() {
-  const [d, t, common, locale] = await Promise.all([
+  const [d, me, t, common, locale] = await Promise.all([
     getToday(),
+    getCurrentUser(),
     getTranslations("today"),
     getTranslations("common"),
     getLocale(),
@@ -54,7 +56,7 @@ export default async function TodayPage() {
     <>
       <PageHeader
         overline={date.charAt(0).toUpperCase() + date.slice(1)}
-        title={t("hello", { name: teamMember("manager").name })}
+        title={t("hello", { name: me.name })}
         action={
           <>
             <div className="hidden lg:block">{handle}</div>
@@ -63,7 +65,7 @@ export default async function TodayPage() {
               aria-label={common("account")}
               className="flex size-11 flex-none items-center justify-center rounded-lg border border-border bg-surface font-semibold lg:hidden"
             >
-              S
+              {me.name[0]}
             </Link>
           </>
         }

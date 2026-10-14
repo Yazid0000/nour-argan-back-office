@@ -3,6 +3,16 @@
 
 /** Montant en centimes (1 MAD = 100), pour ne jamais arrondir de travers. */
 export type Cents = number;
+/** Gérante (tout) ou préparateur (seulement les colis). */
+export const roles = ["manager", "preparer"] as const;
+export type Role = (typeof roles)[number];
+
+/** Où arrive chaque rôle après la connexion. */
+export const roleHome: Record<Role, string> = { manager: "/app", preparer: "/app/preparation" };
+
+/** La base renvoie un texte. On ne garde qu'un rôle connu, sinon null (aucun accès). */
+export const parseRole = (value: unknown): Role | null => roles.find((r) => r === value) ?? null;
+
 export const currencies = ["MAD", "EUR"] as const;
 export type Currency = (typeof currencies)[number];
 

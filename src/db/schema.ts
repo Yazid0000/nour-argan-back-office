@@ -1,6 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import { boolean, check, index, integer, pgEnum, pgTable, serial, text, timestamp, unique } from "drizzle-orm/pg-core";
-import { actors, categories, countries, currencies, historyKinds, payments, statuses } from "../lib/domain";
+import { actors, categories, roles, countries, currencies, historyKinds, payments, statuses } from "../lib/domain";
 
 // Le schéma de la base, écrit en TypeScript. drizzle-kit en tire les migrations SQL (dossier drizzle/).
 // Les noms de colonnes en camelCase ici deviennent snake_case en base (option casing).
@@ -43,7 +43,7 @@ export const variants = pgTable(
   {
     id: text().primaryKey(),
     // Clé étrangère vers le produit. Supprimer un produit jamais vendu supprime ses formats. Un produit vendu,
-    // lui, est protégé par les lignes de commande qui pointent vers ses formats : on le masque au lieu de le supprimer.
+    // lui, est protégé par les lignes de commande qui pointent vers ses formats. On le masque au lieu de le supprimer.
     productId: text()
       .notNull()
       .references(() => products.id, { onDelete: "cascade" }),
@@ -147,3 +147,73 @@ export const orderLinesRelations = relations(orderLines, ({ one }) => ({
 export const orderEventsRelations = relations(orderEvents, ({ one }) => ({
   order: one(orders, { fields: [orderEvents.orderId], references: [orders.id] }),
 }));
+
+// Tables de Better Auth (connexion). Leur forme est imposée par la bibliothèque.
+// Le mot de passe n'est jamais stocké en clair. account.password contient son empreinte (scrypt).
+
+export const roleEnum = pgEnum("role", roles);
+
+const authDates = () => ({
+  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+});
+
+export const user = pgTable("user", {
+  id: text().primaryKey(),
+  name: text().notNull(),
+  email: text().notNull().unique(),
+  emailVerified: boolean().notNull().default(false),
+  image: text(),
+  // L'autorisation repose sur ce champ. Il ne peut pas être choisi à l'inscription (input: false dans auth.ts).
+  role: roleEnum().notNull().default("preparer"),
+  ...authDates(),
+});
+
+export const session = pgTable(
+  "session",
+  {
+    id: text().primaryKey(),
+    expiresAt: timestamp({ withTimezone: true }).notNull(),
+    token: text().notNull().unique(),
+    ipAddress: text(),
+    userAgent: text(),
+    userId: text()
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    ...authDates(),
+  },
+  (t) => [index().on(t.userId)],
+);
+
+export const account = pgTable(
+  "account",
+  {
+    id: text().primaryKey(),
+    accountId: text().notNull(),
+    providerId: text().notNull(),
+    userId: text()
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    accessToken: text(),
+    refreshToken: text(),
+    idToken: text(),
+    accessTokenExpiresAt: timestamp({ withTimezone: true }),
+    refreshTokenExpiresAt: timestamp({ withTimezone: true }),
+    scope: text(),
+    password: text(),
+    ...authDates(),
+  },
+  (t) => [index().on(t.userId)],
+);
+
+export const verification = pgTable(
+  "verification",
+  {
+    id: text().primaryKey(),
+    identifier: text().notNull(),
+    value: text().notNull(),
+    expiresAt: timestamp({ withTimezone: true }).notNull(),
+    ...authDates(),
+  },
+  (t) => [index().on(t.identifier)],
+);

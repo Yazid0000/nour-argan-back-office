@@ -1,13 +1,20 @@
 // Vide la base et la remplit avec les données de démo. Lancer avec npm run db:seed
 import "./network";
+import { hashPassword } from "better-auth/crypto";
 import { sql } from "drizzle-orm";
+import { demoAccounts } from "../lib/auth";
 import { generateDemo } from "../lib/demo-data";
 import { total } from "../lib/domain";
 import { db } from "./index";
-import { customers, orderEvents, orderLines, orders, products, variants } from "./schema";
+import { account, customers, orderEvents, orderLines, orders, products, user, variants } from "./schema";
 
 async function main() {
   const demo = generateDemo(new Date());
+  const password = process.env.DEMO_PASSWORD;
+  if (!password) throw new Error("DEMO_PASSWORD manque dans .env.local");
+  // Même fonction de hachage que Better Auth à la connexion (scrypt). Le mot de passe en clair n'est jamais stocké.
+  const passwordHash = await hashPassword(password);
+  const people = Object.entries(demoAccounts).map(([role, a]) => ({ ...a, role: role as keyof typeof demoAccounts }));
 
   // Un seul batch, donc une seule transaction. Si une insertion échoue, rien n'est gardé
   // et la base reste comme avant au lieu d'être à moitié vide.
@@ -19,6 +26,12 @@ async function main() {
     db.delete(customers),
     db.delete(variants),
     db.delete(products),
+    // Supprimer les utilisateurs supprime aussi leurs sessions et comptes (clés étrangères en cascade).
+    db.delete(user),
+    db.insert(user).values(people.map((p) => ({ id: p.id, name: p.name, email: p.email, role: p.role, emailVerified: true }))),
+    db.insert(account).values(
+      people.map((p) => ({ id: `account-${p.id}`, accountId: p.id, providerId: "credential", userId: p.id, password: passwordHash })),
+    ),
     db.insert(products).values(
       demo.products.map((p, i) => ({
         id: p.id,
@@ -58,7 +71,7 @@ async function main() {
   // Les numéros ont été imposés par le seed. Le compteur automatique repart après le plus grand.
   await db.execute(sql`select setval(pg_get_serial_sequence('orders', 'id'), (select max(id) from orders))`);
 
-  console.log(`Base remplie : ${demo.products.length} produits, ${demo.customers.length} clients, ${demo.orders.length} commandes.`);
+  console.log(`Base remplie : ${people.length} comptes démo, ${demo.products.length} produits, ${demo.customers.length} clients, ${demo.orders.length} commandes.`);
 }
 
 main().catch((e) => {

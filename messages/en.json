@@ -119,7 +119,13 @@
     "show": "Show",
     "hide": "Hide",
     "asManager": "Enter as manager",
-    "asPreparer": "Enter as packer"
+    "asPreparer": "Enter as packer",
+    "signIn": "Log in",
+    "emailPlaceholder": "you@nourargan.ma",
+    "errorInvalid": "Wrong password. Check the capitals and try again.",
+    "errorMissing": "Enter your e-mail and password.",
+    "errorTooMany": "Too many attempts. Wait a minute and try again.",
+    "errorDemo": "The demo isn't ready right now. Try again in a moment."
   },
   "today": {
     "hello": "Hello {name}",
@@ -212,7 +218,13 @@
     "emptyBody": "New parcels show up here as soon as Salma confirms an order.",
     "preparedToday": "Packed today",
     "itemsPacked": "Items packed",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "views": "Views",
+    "tabToPack": "To pack",
+    "tabShipped": "Shipped",
+    "items": "{count, plural, one {# item} other {# items}}",
+    "shippedWhen": "Shipped {when}",
+    "emptyShipped": "No parcel on the road right now."
   },
   "products": {
     "title": "Products",
@@ -378,6 +390,9 @@
     "errorBody": "Something went wrong loading this page. Try again, and if it keeps happening, reload the app.",
     "retry": "Try again",
     "notFound": "This page doesn't exist.",
-    "notFoundLink": "Back to Today"
+    "notFoundLink": "Back to Today",
+    "forbiddenTitle": "This page is for the manager only.",
+    "forbiddenBody": "Your packer account gives access to the parcels to pack and ship.",
+    "forbiddenLink": "Go to parcels"
   }
 }

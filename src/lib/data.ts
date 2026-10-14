@@ -1,8 +1,9 @@
+import "server-only";
 import { cache } from "react";
 import { connection } from "next/server";
 import { type SQLWrapper, and, asc, count, desc, eq, gt, gte, inArray, lte, notInArray, or, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { customers, orderEvents, orderLines, orders, products, variants } from "@/db/schema";
+import { customers, orderEvents, orderLines, orders, products, user, variants } from "@/db/schema";
 import { settings } from "./demo-data";
 import {
   type Cents,
@@ -11,6 +12,7 @@ import {
   type OrderTab,
   type Payment,
   type Product,
+  type Role,
   type Status,
   orderTabs,
   productLevel,
@@ -18,6 +20,7 @@ import {
   variantLevel,
 } from "./domain";
 import { TIME_ZONE, dayKey, normalize } from "./format";
+import { requireRole } from "./session";
 
 // Les lectures des écrans. Postgres filtre, trie et additionne. Les règles métier
 // (niveau de stock, segment client) restent dans domain.ts.
@@ -28,9 +31,13 @@ const EUR_IN_MAD = 10.8;
 const NOT_SALES: Status[] = ["cancelled", "refused", "returned"];
 const RETURNS: Status[] = ["refused", "returned"];
 
-/** Les données dépendent de l'heure. On attend une vraie requête au lieu de les figer au build. */
-async function start() {
+/**
+ * Chaque lecture commence ici. On vérifie qui demande (session et rôle) avant de toucher aux données,
+ * puis on renvoie l'heure de la requête (les données en dépendent, on ne les fige pas au build).
+ */
+async function access(...allowed: Role[]) {
   await connection();
+  await requireRole(...allowed);
   return new Date();
 }
 
@@ -144,7 +151,7 @@ export type TodoItem =
   | { kind: "refused"; orderId: string; number: number; city: string };
 
 export async function getToday() {
-  const now = await start();
+  const now = await access("manager");
   const today = startOfToday(now);
   const week = new Date(now.getTime() - 7 * DAY);
 
@@ -258,7 +265,7 @@ export const oldestFirst = (tab: OrderTab) => tab === "toConfirm" || tab === "to
 export const ORDERS_LIMIT = 50;
 
 export async function listOrders({ tab, q = "", payment }: { tab: OrderTab; q?: string; payment?: Payment }) {
-  const now = await start();
+  const now = await access("manager");
   const filters = and(payment ? eq(orders.payment, payment) : undefined, searchCustomer(q, true));
   const [byStatus, rows] = await Promise.all([
     db
@@ -295,7 +302,7 @@ const orderNumber = (id: string) => (/^\d{1,9}$/.test(id) ? Number(id) : null);
 
 // La page et le panneau de détail demandent la même commande. cache() n'en fait qu'une lecture par requête.
 export const getOrder = cache(async (id: string) => {
-  const now = await start();
+  const now = await access("manager");
   const number = orderNumber(id);
   if (number === null) return null;
   const o = await db.query.orders.findFirst({
@@ -321,7 +328,7 @@ export const getOrder = cache(async (id: string) => {
 });
 
 export async function getPreparation() {
-  const now = await start();
+  const now = await access("manager", "preparer");
   const preparedToday = db
     .select({ orderId: orderEvents.orderId })
     .from(orderEvents)
@@ -353,10 +360,34 @@ export async function getPreparation() {
   };
 }
 
+/** Les colis partis chez le livreur, du plus récent au plus ancien. Le préparateur les voit aussi. */
+export async function getShipped() {
+  const now = await access("manager", "preparer");
+  const shippedAt = sql`max(${orderEvents.at}) filter (where ${orderEvents.kind} = 'shipped')`.mapWith(orderEvents.at);
+  const rows = await db
+    .select({
+      id: orders.id,
+      payment: orders.payment,
+      currency: orders.currency,
+      total: orders.total,
+      name: customers.name,
+      city: customers.city,
+      items: sql<number>`(select coalesce(sum(${orderLines.qty}), 0) from ${orderLines} where ${orderLines.orderId} = ${orders.id})`.mapWith(Number),
+      shippedAt,
+    })
+    .from(orders)
+    .innerJoin(customers, eq(orders.customerId, customers.id))
+    .leftJoin(orderEvents, eq(orderEvents.orderId, orders.id))
+    .where(eq(orders.status, "shipped"))
+    .groupBy(orders.id, customers.id)
+    .orderBy(desc(shippedAt));
+  return { now, orders: rows.map((r) => ({ ...r, number: r.id, id: String(r.id) })) };
+}
+
 export type ProductFilter = "all" | "low" | "out" | "hidden";
 
 export async function listProducts({ filter, q = "" }: { filter: ProductFilter; q?: string }) {
-  await start();
+  await access("manager");
   const all = await allProducts();
   const query = normalize(q.trim());
   const found = all.filter((p) => !query || normalize(p.name.fr).includes(query) || normalize(p.name.en).includes(query));
@@ -373,7 +404,7 @@ export async function listProducts({ filter, q = "" }: { filter: ProductFilter; 
 }
 
 export async function getProduct(id: string) {
-  await start();
+  await access("manager");
   const p = await db.query.products.findFirst({ where: eq(products.id, id), with: { variants: true } });
   return p ? toProduct(p) : null;
 }
@@ -381,7 +412,7 @@ export async function getProduct(id: string) {
 export type CustomerFilter = "all" | "loyal" | "new" | "dormant";
 
 export async function listCustomers({ segment, q = "" }: { segment: CustomerFilter; q?: string }) {
-  const now = await start();
+  const now = await access("manager");
   const [rows, total] = await Promise.all([
     db
       .select({
@@ -416,7 +447,7 @@ export async function listCustomers({ segment, q = "" }: { segment: CustomerFilt
 }
 
 export const getCustomer = cache(async (id: string) => {
-  const now = await start();
+  const now = await access("manager");
   const c = await db.query.customers.findFirst({
     where: eq(customers.id, id),
     with: { orders: { orderBy: desc(orders.createdAt) } },
@@ -443,7 +474,7 @@ export const periods = { "7": 7, "30": 30, "90": 90, "365": 365 } as const;
 export type Period = keyof typeof periods;
 
 export async function getStats(period: Period) {
-  const now = await start();
+  const now = await access("manager");
   const days = periods[period];
   const from = new Date(now.getTime() - days * DAY);
   const inRange = and(isSale, between(from, now));
@@ -509,23 +540,19 @@ export async function getStats(period: Period) {
 }
 
 export async function getNavCounts() {
-  await start();
+  await access("manager");
   const [r] = await db.select({ n: count() }).from(orders).where(eq(orders.status, "received"));
   return { toConfirm: r.n };
 }
 
-/** Qui utilise l'écran. En phase 3, ce sera la personne connectée (session). */
-export function teamMember(role: (typeof settings.team)[number]["role"]) {
-  return settings.team.find((m) => m.role === role)!;
-}
-
 export async function getSettings() {
-  await connection();
-  return settings;
+  await access("manager");
+  const team = await db.select({ name: user.name, email: user.email, role: user.role }).from(user).orderBy(asc(user.role));
+  return { ...settings, team };
 }
 
 export async function getCustomerCount() {
-  await start();
+  await access("manager");
   const [r] = await db.select({ n: count() }).from(customers);
   return r.n;
 }

@@ -298,9 +298,5 @@ export const settings = {
   ],
   freeShippingFrom: FREE_SHIPPING_MAD as Cents | null,
   payments: { cod: true, transfer: true, card: false } satisfies Record<Payment, boolean>,
-  team: [
-    { name: "Salma", email: "salma@nourargan.ma", role: "manager" as const },
-    { name: "Youssef", email: "youssef@nourargan.ma", role: "preparer" as const },
-  ],
   notifications: { newOrder: true, lowStock: true, dailySummary: false },
 };

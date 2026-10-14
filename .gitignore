@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# Le modèle sans valeurs, lui, doit être dans Git.
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +41,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Sorties de graphify (graphe de connaissance du code), régénérables avec /graphify
+graphify-out/

@@ -15,7 +15,9 @@ import {
 import { ThemeSelect } from "@/components/theme-select";
 import { Card, PageHeader, Switch, buttonStyles, cx, inputStyles } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
-import { getCustomerCount, getSettings, getStats, teamMember } from "@/lib/data";
+import { LogoutButton } from "@/components/logout-button";
+import { getCustomerCount, getSettings, getStats } from "@/lib/data";
+import { getCurrentUser } from "@/lib/session";
 import { formatMoney } from "@/lib/format";
 
 function Row({ href, icon: Icon, title, hint }: { href: string; icon: Icon; title: string; hint: string }) {
@@ -41,8 +43,9 @@ function Section({ id, title, children }: { id: string; title: string; children:
 }
 
 export default async function SettingsPage() {
-  const [s, customers, stats, t, common, nav, locale] = await Promise.all([
+  const [s, me, customers, stats, t, common, nav, locale] = await Promise.all([
     getSettings(),
+    getCurrentUser(),
     getCustomerCount(),
     getStats("30"),
     getTranslations("settings"),
@@ -51,7 +54,6 @@ export default async function SettingsPage() {
     getLocale(),
   ]);
   const money = (cents: number) => formatMoney(cents, "MAD", locale);
-  const me = teamMember("manager");
   const sections = [
     { id: "boutique", icon: StorefrontIcon, title: t("shop"), hint: t("shopHint") },
     { id: "livraison", icon: TruckIcon, title: t("shipping"), hint: t("shippingHint") },
@@ -155,7 +157,7 @@ export default async function SettingsPage() {
                       <span className="block text-sm font-semibold">{m.name}</span>
                       <span className="block text-xs text-text-2">{m.email}</span>
                     </span>
-                    <span className="text-xs text-text-2">{m.role === "manager" ? common("manager") : common("preparer")}</span>
+                    <span className="text-xs text-text-2">{common(m.role)}</span>
                   </li>
                 ))}
               </ul>
@@ -210,9 +212,9 @@ export default async function SettingsPage() {
             </Card>
           </Section>
 
-          <Link href="/connexion" className="flex min-h-12 items-center justify-center text-sm font-semibold text-err-fg lg:justify-start">
+          <LogoutButton className="flex min-h-12 w-full items-center justify-center text-sm font-semibold text-err-fg lg:justify-start">
             {common("logout")}
-          </Link>
+          </LogoutButton>
         </div>
       </div>
     </>
