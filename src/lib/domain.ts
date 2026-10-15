@@ -75,6 +75,7 @@ export type OrderLine = {
  * Cycle de vie d'une commande :
  * received → confirmed → prepared → shipped → delivered
  * shipped → refused (colis refusé) → returned (remis en stock)
+ * delivered → returned (le client renvoie sa commande, remise en stock)
  * received | confirmed | prepared → cancelled
  */
 export const statuses = [
@@ -89,9 +90,14 @@ export const statuses = [
 ] as const;
 export type Status = (typeof statuses)[number];
 
+export const actions = ["confirm", "markPrepared", "markShipped", "markDelivered", "markRefused", "restock", "recordReturn", "cancel"] as const;
+export type Action = (typeof actions)[number];
 /** La prochaine étape logique, le bouton principal de la commande. */
-export type NextAction = "confirm" | "markPrepared" | "markShipped" | "markDelivered" | "restock";
-export type Action = NextAction | "markRefused" | "cancel";
+export type NextAction = Exclude<Action, "markRefused" | "recordReturn" | "cancel">;
+
+/** Les actions qu'on ne peut pas défaire. L'interface les montre en rouge et demande confirmation. */
+export const irreversibleActions = ["cancel", "markRefused", "recordReturn"] as const;
+export const isIrreversible = (a: Action): a is (typeof irreversibleActions)[number] => (irreversibleActions as readonly Action[]).includes(a);
 
 /** Pour chaque statut, le bouton principal (la prochaine étape) et les actions secondaires. */
 export const transitions: Record<Status, { next: NextAction | null; others: Action[] }> = {
@@ -99,10 +105,49 @@ export const transitions: Record<Status, { next: NextAction | null; others: Acti
   confirmed: { next: "markPrepared", others: ["cancel"] },
   prepared: { next: "markShipped", others: ["cancel"] },
   shipped: { next: "markDelivered", others: ["markRefused"] },
-  delivered: { next: null, others: [] },
+  delivered: { next: null, others: ["recordReturn"] },
   refused: { next: "restock", others: [] },
   returned: { next: null, others: [] },
   cancelled: { next: null, others: [] },
+};
+
+/** Le statut où arrive la commande après chaque action. */
+export const actionTarget: Record<Action, Status> = {
+  confirm: "confirmed",
+  markPrepared: "prepared",
+  markShipped: "shipped",
+  markDelivered: "delivered",
+  markRefused: "refused",
+  restock: "returned",
+  recordReturn: "returned",
+  cancel: "cancelled",
+};
+
+/** Qui peut faire quoi. Le préparateur fait avancer les colis, la gérante tout le reste. */
+export const actionRoles: Record<Action, readonly Role[]> = {
+  confirm: ["manager"],
+  markPrepared: ["manager", "preparer"],
+  markShipped: ["manager", "preparer"],
+  markDelivered: ["manager", "preparer"],
+  markRefused: ["manager"],
+  restock: ["manager"],
+  recordReturn: ["manager"],
+  cancel: ["manager"],
+};
+
+/** Les statuts depuis lesquels une action est possible, lus dans le tableau transitions. */
+export const fromStatuses = (action: Action): Status[] =>
+  statuses.filter((s) => transitions[s].next === action || transitions[s].others.includes(action));
+
+/**
+ * Le stock est retiré à la confirmation. Il est remis si on annule une commande déjà confirmée,
+ * ou quand un colis refusé ou une commande renvoyée revient en stock.
+ */
+export const stockEffect: Partial<Record<Action, { sign: -1 | 1; onlyFrom?: Status[] }>> = {
+  confirm: { sign: -1 },
+  cancel: { sign: 1, onlyFrom: ["confirmed", "prepared"] },
+  restock: { sign: 1 },
+  recordReturn: { sign: 1 },
 };
 
 /** Les étapes du rail de statut, dans l'ordre. */
@@ -126,7 +171,10 @@ export type HistoryKind = (typeof historyKinds)[number];
 
 export type HistoryEvent = {
   at: Date;
-  actor: Actor;
+  /** Événements de la démo (site, livreur, prénoms) ; null quand une vraie personne connectée a agi. */
+  actor: Actor | null;
+  /** Nom de la personne connectée au moment de l'action, gardé même si le compte disparaît. */
+  userName: string | null;
   kind: HistoryKind;
 };
 

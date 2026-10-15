@@ -33,7 +33,7 @@ export async function CustomersScreen({ segment, q = "", selectedId }: { segment
   const when = { today: common("today"), yesterday: common("yesterday") };
 
   return (
-    <div className="grid min-h-0 flex-1 auto-rows-[minmax(0,1fr)] grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] lg:overflow-hidden">
+    <div className="grid min-h-0 flex-1 auto-rows-[minmax(0,1fr)] grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_380px] lg:overflow-hidden">
       <div className={cx("flex min-w-0 flex-col lg:overflow-y-auto lg:pb-8", selectedId && "max-lg:hidden")}>
         <header className="px-5 pt-5 pb-3.5 lg:px-10 lg:pt-7 lg:pb-5">
           <p className="mb-0.5 text-[13px] text-text-2 lg:text-sm">{t("count", { count })}</p>
@@ -47,7 +47,7 @@ export async function CustomersScreen({ segment, q = "", selectedId }: { segment
             <input name="q" type="search" defaultValue={q} placeholder={t("search")} className={cx(inputStyles, "pl-10")} />
           </label>
         </form>
-        <nav aria-label={t("title")} className="order-2 flex flex-none gap-2 overflow-x-auto px-5 pb-3 [scrollbar-width:none] lg:order-1 lg:px-10">
+        <nav aria-label={t("title")} className="order-2 flex flex-none gap-2 overflow-x-auto px-5 pb-3 [scrollbar-width:none] lg:order-1 lg:flex-wrap lg:px-10">
           {customerFilters.map((s) => (
             <Link key={s} href={`/app/clients?${query(s)}`} aria-current={s === segment ? "page" : undefined} className="flex-none">
               <Chip active={s === segment}>
@@ -64,7 +64,7 @@ export async function CustomersScreen({ segment, q = "", selectedId }: { segment
             <div className="overflow-hidden rounded-lg border border-border bg-surface">
               <div className="hidden grid-cols-[minmax(0,1fr)_64px_100px_96px] gap-3 2xl:grid-cols-[minmax(0,1fr)_72px_110px_110px_100px] px-4 py-2.5 text-xs text-text-2 lg:grid" aria-hidden>
                 <span>{t("colCustomer")}</span>
-                <span className="text-right">{t("colOrders")}</span>
+                <span className="hidden text-right xl:block">{t("colOrders")}</span>
                 <span className="text-right">{t("colTotal")}</span>
                 <span className="hidden 2xl:block">{t("colLast")}</span>
               </div>
@@ -75,7 +75,7 @@ export async function CustomersScreen({ segment, q = "", selectedId }: { segment
                     <li
                       key={r.customer.id}
                       className={cx(
-                        "relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 border-t border-border px-3.5 py-2.5 first:border-t-0 lg:grid-cols-[minmax(0,1fr)_64px_100px_96px] 2xl:grid-cols-[minmax(0,1fr)_72px_110px_110px_100px] lg:first:border-t",
+                        "relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 border-t border-border px-3.5 py-2.5 first:border-t-0 lg:grid-cols-[minmax(0,1fr)_100px_96px] xl:grid-cols-[minmax(0,1fr)_64px_100px_96px] 2xl:grid-cols-[minmax(0,1fr)_72px_110px_110px_100px] lg:first:border-t",
                         active ? "bg-accent-soft" : "hover:bg-bg",
                       )}
                     >
@@ -91,11 +91,11 @@ export async function CustomersScreen({ segment, q = "", selectedId }: { segment
                           </Link>
                           <p className="truncate font-mono text-xs text-text-2">
                             <span className="font-sans">{r.customer.city}</span>
-                            <span className="lg:hidden"> · {t("orders", { count: r.orderCount })}</span>
+                            <span className="xl:hidden"> · {t("orders", { count: r.orderCount })}</span>
                           </p>
                         </div>
                       </div>
-                      <span className="hidden text-right font-mono text-sm lg:block">{r.orderCount}</span>
+                      <span className="hidden text-right font-mono text-sm xl:block">{r.orderCount}</span>
                       <div className="flex flex-col items-end gap-1 lg:block lg:text-right">
                         <Money cents={r.total} className="text-sm" />
                         <span className="lg:hidden">

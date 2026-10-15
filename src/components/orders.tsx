@@ -13,9 +13,10 @@ import {
 } from "@phosphor-icons/react/ssr";
 import { Link } from "@/i18n/navigation";
 import { ORDERS_LIMIT, getOrder, listOrders, oldestFirst } from "@/lib/data";
-import { type OrderTab, type Payment, orderTabs, payments, railSteps, subtotal, transitions } from "@/lib/domain";
+import { type OrderTab, type Payment, isIrreversible, orderTabs, payments, railSteps, subtotal, transitions } from "@/lib/domain";
 import { dayKey, formatMoney, formatTime, formatWhen } from "@/lib/format";
 import { AutoSubmitSelect } from "./auto-submit-select";
+import { OrderActionForm } from "./order-action-form";
 import { ActionBar, EmptyState, Money, StatusPill, Swatch, buttonStyles, cx, inputStyles } from "./ui";
 
 export const paymentIcons: Record<Payment, typeof MoneyIcon> = { cod: MoneyIcon, card: CreditCardIcon, transfer: BankIcon };
@@ -79,10 +80,10 @@ export async function OrdersScreen({
         <h1 className={cx("px-5 pt-5 pb-3.5 font-display text-[28px] font-semibold tracking-[-0.02em] lg:p-0 lg:text-[32px]", selectedId && "max-lg:sr-only")}>
           {t("title")}
         </h1>
-        <div className={cx("flex px-5 pb-3 lg:p-0", selectedId && "max-lg:hidden")}>{search}</div>
+        <div className={cx("flex px-5 pb-3 lg:w-[420px] lg:p-0", selectedId && "max-lg:hidden")}>{search}</div>
       </div>
 
-      <div className="grid min-h-0 flex-1 auto-rows-[minmax(0,1fr)] grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] lg:overflow-hidden">
+      <div className="grid min-h-0 flex-1 auto-rows-[minmax(0,1fr)] grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_400px] lg:overflow-hidden">
         <div className={cx("flex min-w-0 flex-col lg:overflow-y-auto lg:pr-6 lg:pb-8 lg:pl-10", selectedId && "max-lg:hidden")}>
           <nav aria-label={t("title")} className="flex flex-none gap-1 overflow-x-auto overflow-y-hidden border-b border-border px-3 [scrollbar-width:none] lg:px-0">
             {tabKeys.map((k) => (
@@ -138,10 +139,11 @@ export async function OrdersScreen({
                           </div>
                         </div>
                         {next && (
-                          // L'action elle-même arrive à la phase 4. En attendant, le bouton ouvre la commande.
-                          <Link href={`/app/commandes/${o.id}`} className={cx(buttonStyles.outline, "relative z-10 h-11 text-sm")}>
-                            {action(next)}
-                          </Link>
+                          <OrderActionForm
+                            orderId={o.id}
+                            className="relative z-10 justify-end"
+                            buttons={[{ action: next, label: action(next), look: "outline", className: "h-11 text-sm" }]}
+                          />
                         )}
                       </div>
                     </li>
@@ -155,10 +157,10 @@ export async function OrdersScreen({
                     <tr className="[&>th]:px-3 [&>th]:py-2.5 [&>th]:font-medium">
                       <th>{t("colNumber")}</th>
                       <th>{t("colCustomer")}</th>
-                      <th>{t("colCity")}</th>
-                      <th>{t("colPayment")}</th>
+                      <th className="hidden 2xl:table-cell">{t("colCity")}</th>
+                      <th className="hidden xl:table-cell">{t("colPayment")}</th>
                       <th className="text-right">{t("colAmount")}</th>
-                      <th className="text-right">{t("colReceived")}</th>
+                      <th className="hidden text-right xl:table-cell">{t("colReceived")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -172,13 +174,13 @@ export async function OrdersScreen({
                               #{o.number}
                             </Link>
                           </td>
-                          <td className="font-medium">{o.name}</td>
-                          <td>{o.city}</td>
-                          <td className="text-xs text-text-2">
+                          <td className="w-full max-w-0 truncate font-medium">{o.name}</td>
+                          <td className="hidden whitespace-nowrap 2xl:table-cell">{o.city}</td>
+                          <td className="hidden text-xs text-text-2 xl:table-cell">
                             <span className="inline-flex items-center gap-1.5 whitespace-nowrap"><Icon aria-hidden size={14} />{pay(o.payment)}</span>
                           </td>
-                          <td className="text-right"><Money cents={o.total} currency={o.currency} /></td>
-                          <td className="text-right font-mono text-xs text-text-2">{formatWhen(o.createdAt, now, locale, when)}</td>
+                          <td className="text-right whitespace-nowrap"><Money cents={o.total} currency={o.currency} /></td>
+                          <td className="hidden text-right font-mono text-xs whitespace-nowrap text-text-2 xl:table-cell">{formatWhen(o.createdAt, now, locale, when)}</td>
                         </tr>
                       );
                     })}
@@ -343,7 +345,9 @@ export async function OrderDetail({ id, backHref }: { id: string; backHref: stri
                 <span className="w-[5.5rem] flex-none font-mono text-[13px] text-text-2">{when(h.at)}</span>
                 <span>
                   {history(h.kind)}
-                  {h.actor !== "site" && <span className="text-text-2"> · {actor(h.actor)}</span>}
+                  {(h.userName || (h.actor && h.actor !== "site")) && (
+                    <span className="text-text-2"> · {h.userName ?? actor(h.actor!)}</span>
+                  )}
                 </span>
               </li>
             ))}
@@ -362,23 +366,34 @@ export async function OrderDetail({ id, backHref }: { id: string; backHref: stri
         </Section>
 
         {others.length > 0 && (
-          <div className="flex flex-wrap gap-x-4">
-            {others.map((a) => (
-              <button key={a} type="button" className={cx("min-h-11 text-sm font-medium", a === "cancel" || a === "markRefused" ? "text-err-fg" : "text-accent")}>
-                {action(a)}
-              </button>
-            ))}
-          </div>
+          <OrderActionForm
+            orderId={order.id}
+            className="gap-x-4"
+            buttons={others.map((a) => ({ action: a, label: action(a), look: isIrreversible(a) ? "danger" : "link" }))}
+          />
         )}
       </div>
 
       <ActionBar className="bg-surface lg:static lg:px-6">
         <div className="contents lg:hidden">{callButtons}</div>
         {next && (
-          <button type="button" className={cx(buttonStyles.primary, "h-[52px] flex-1 text-base lg:h-12")}>
-            <CheckIcon aria-hidden size={18} weight="bold" />
-            {actionLong(next)}
-          </button>
+          <OrderActionForm
+            orderId={order.id}
+            className="flex-1"
+            buttons={[
+              {
+                action: next,
+                look: "primary",
+                className: "h-[52px] w-full text-base lg:h-12",
+                label: (
+                  <>
+                    <CheckIcon aria-hidden size={18} weight="bold" />
+                    {actionLong(next)}
+                  </>
+                ),
+              },
+            ]}
+          />
         )}
       </ActionBar>
     </article>

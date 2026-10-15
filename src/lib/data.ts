@@ -322,7 +322,7 @@ export const getOrder = cache(async (id: string) => {
     lines,
     shippingFee: o.shippingFee,
     note: o.note,
-    history: o.events.map((e) => ({ at: e.at, actor: e.actor, kind: e.kind })),
+    history: o.events.map((e) => ({ at: e.at, actor: e.actor, userName: e.userName, kind: e.kind })),
   };
   return { now, order, customer: o.customer, lines, total: o.total };
 });

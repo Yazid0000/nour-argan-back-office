@@ -3,18 +3,21 @@
 import { useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { CheckIcon } from "@phosphor-icons/react/ssr";
-import { buttonStyles, cx } from "./ui";
+import { OrderActionForm } from "./order-action-form";
+import { cx } from "./ui";
 
 type Item = { id: string; name: string; label: string | null; qty: number; swatch: ReactNode };
 
 /** Une commande à préparer. On coche chaque article en le mettant dans le carton. */
 export function PrepCard({
+  orderId,
   title,
   subtitle,
   items,
   prepared,
   primary,
 }: {
+  orderId: string;
   title: ReactNode;
   subtitle: string;
   items: Item[];
@@ -23,9 +26,12 @@ export function PrepCard({
 }) {
   const t = useTranslations("prep");
   const action = useTranslations("action");
-  const [checked, setChecked] = useState<Set<string>>(() => new Set(prepared ? items.map((i) => i.id) : []));
+  const [ticked, setTicked] = useState<Set<string>>(() => new Set());
+  // Une commande préparée a tout dans le carton, même si la carte vient d'y passer sous nos yeux.
+  const checked = prepared ? new Set(items.map((i) => i.id)) : ticked;
+  const nextAction = prepared ? "markShipped" : "markPrepared";
   const toggle = (id: string) =>
-    setChecked((prev) => {
+    setTicked((prev) => {
       const next = new Set(prev);
       if (!next.delete(id)) next.add(id);
       return next;
@@ -46,7 +52,7 @@ export function PrepCard({
           return (
             <li key={item.id}>
               <label className="flex min-h-14 cursor-pointer items-center gap-3 px-3.5 py-2">
-                <input type="checkbox" checked={on} onChange={() => toggle(item.id)} className="peer sr-only" />
+                <input type="checkbox" checked={on} onChange={() => toggle(item.id)} disabled={prepared} className="peer sr-only" />
                 <span
                   aria-hidden
                   className={cx(
@@ -68,11 +74,22 @@ export function PrepCard({
         })}
       </ul>
       <div className="px-3.5 pt-1 pb-3.5">
-        {/* Le changement de statut arrive à la phase 4. */}
-        <button type="button" className={cx(primary ? buttonStyles.primary : buttonStyles.secondary, "h-12 w-full text-[15px]")}>
-          <CheckIcon aria-hidden size={18} />
-          {action(prepared ? "markShipped" : "markPrepared")}
-        </button>
+        <OrderActionForm
+          orderId={orderId}
+          buttons={[
+            {
+              action: nextAction,
+              look: primary ? "primary" : "secondary",
+              className: "h-12 w-full text-[15px]",
+              label: (
+                <>
+                  <CheckIcon aria-hidden size={18} />
+                  {action(nextAction)}
+                </>
+              ),
+            },
+          ]}
+        />
       </div>
     </li>
   );

@@ -280,11 +280,11 @@ function historyFor(o: Order, now: Date, rand: () => number, urgent: boolean): H
     // Les colis à préparer ont été confirmés dans la journée. Les urgents attendent depuis plus de 24 h.
     if (kind === "confirmed" && (o.status === "confirmed" || o.status === "prepared"))
       t = Math.max(o.createdAt.getTime() + HOUR, now.getTime() - (urgent ? 26 + rand() * 6 : 2 + rand() * 18) * HOUR);
-    events.push({ at: new Date(Math.min(t, now.getTime() - 60_000)), actor, kind });
+    events.push({ at: new Date(Math.min(t, now.getTime() - 60_000)), actor, userName: null, kind });
     if (kind === o.status) break;
   }
   if (o.status === "received" && rand() < 0.5) {
-    events.push({ at: new Date(Math.min(o.createdAt.getTime() + HOUR, now.getTime() - 60_000)), actor: "salma", kind: "callNoAnswer" });
+    events.push({ at: new Date(Math.min(o.createdAt.getTime() + HOUR, now.getTime() - 60_000)), actor: "salma", userName: null, kind: "callNoAnswer" });
   }
   return events;
 }

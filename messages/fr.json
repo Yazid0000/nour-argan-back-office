@@ -56,7 +56,8 @@
     "markDelivered": "Marquer livrée",
     "markRefused": "Colis refusé",
     "restock": "Remettre en stock",
-    "cancel": "Annuler la commande"
+    "cancel": "Annuler la commande",
+    "recordReturn": "Enregistrer un retour"
   },
   "actionLong": {
     "confirm": "Confirmer la commande",
@@ -279,7 +280,22 @@
     "more": "Plus",
     "online": "En ligne",
     "onlineHint": "Visible dans la boutique dès l'enregistrement",
-    "save": "Enregistrer le produit"
+    "save": "Enregistrer le produit",
+    "errorsSummary": "{count, plural, one {# champ à corriger} other {# champs à corriger}} avant d'enregistrer.",
+    "saved": "Produit enregistré.",
+    "errors": {
+      "required": "Ce champ est obligatoire.",
+      "money": "Indique un prix en dirhams, par exemple 180.",
+      "compareAtLow": "Le prix barré doit être plus élevé que le prix.",
+      "tooLong": "C'est trop long.",
+      "stock": "Indique un stock entier, 0 ou plus.",
+      "threshold": "Indique un nombre entier, 0 ou plus.",
+      "variantInUse": "Un format déjà vendu ne peut pas être supprimé. Mets plutôt son stock à 0.",
+      "forbidden": "Seule la gérante peut modifier les produits.",
+      "stockChanged": "Le stock a changé pendant ta modification, une commande vient sans doute d'être confirmée. Recharge la page.",
+      "notFound": "Ce produit n'existe plus.",
+      "invalid": "Cette valeur n'est pas valable."
+    }
   },
   "customers": {
     "title": "Clients",
@@ -394,5 +410,28 @@
     "forbiddenTitle": "Cette page est réservée à la gérante.",
     "forbiddenBody": "Ton compte de préparateur donne accès aux colis à préparer et à expédier.",
     "forbiddenLink": "Aller aux colis"
+  },
+  "orderAction": {
+    "done": {
+      "confirm": "Commande confirmée. Elle passe dans À préparer.",
+      "markPrepared": "Colis préparé. Il attend le livreur.",
+      "markShipped": "Colis remis au livreur.",
+      "markDelivered": "Commande livrée.",
+      "markRefused": "Colis refusé. Pense à le remettre en stock.",
+      "restock": "Articles remis en stock.",
+      "cancel": "Commande annulée.",
+      "recordReturn": "Retour enregistré. Les articles sont remis en stock."
+    },
+    "errors": {
+      "invalid": "Cette action n'est pas possible.",
+      "forbidden": "Ton rôle ne permet pas cette action.",
+      "conflict": "Cette commande a déjà changé entre-temps. La page est à jour.",
+      "outOfStock": "Stock insuffisant pour confirmer. Réapprovisionne d'abord le produit."
+    },
+    "confirm": {
+      "cancel": "Annuler cette commande ? Si elle était confirmée, le stock sera remis.",
+      "markRefused": "Le client a refusé le colis ?",
+      "recordReturn": "Le client a renvoyé sa commande ? Les articles seront remis en stock."
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { ArrowClockwiseIcon, PackageIcon, SignOutIcon, TruckIcon } from "@phosphor-icons/react/ssr";
 import { LogoutButton } from "@/components/logout-button";
+import { OrderActionForm } from "@/components/order-action-form";
 import { paymentIcons } from "@/components/orders";
 import { PrepCard } from "@/components/prep-card";
 import { EmptyState, Swatch, buttonStyles, cx } from "@/components/ui";
@@ -12,10 +13,11 @@ import { getCurrentUser } from "@/lib/session";
 // La vue de Youssef. Les colis à préparer, et ceux déjà partis chez le livreur.
 export default async function PreparationPage({ searchParams }: PageProps<"/[locale]/app/preparation">) {
   const shipped = (await searchParams).vue === "expediees";
-  const [me, t, common, locale, format] = await Promise.all([
+  const [me, t, common, action, locale, format] = await Promise.all([
     getCurrentUser(),
     getTranslations("prep"),
     getTranslations("common"),
+    getTranslations("action"),
     getLocale(),
     getFormatter(),
   ]);
@@ -65,7 +67,6 @@ export default async function PreparationPage({ searchParams }: PageProps<"/[loc
           sent.orders.length === 0 ? (
             <EmptyState icon={<TruckIcon size={28} />} title={t("emptyShipped")} />
           ) : (
-            // Lecture seule pour l'instant. Le bouton « Marquer livrée » arrive à la phase 4.
             <ul className="flex flex-col gap-2.5">
               {sent.orders.map((o) => {
                 const Icon = paymentIcons[o.payment];
@@ -89,6 +90,11 @@ export default async function PreparationPage({ searchParams }: PageProps<"/[loc
                         </span>
                       )}
                     </div>
+                    <OrderActionForm
+                      orderId={o.id}
+                      className="mt-2.5"
+                      buttons={[{ action: "markDelivered", label: action("markDelivered"), look: "outline", className: "h-11 w-full text-sm" }]}
+                    />
                   </li>
                 );
               })}
@@ -119,6 +125,7 @@ export default async function PreparationPage({ searchParams }: PageProps<"/[loc
             {toPack!.orders.map(({ order, customer, lines, total }, i) => (
               <PrepCard
                 key={order.id}
+                orderId={order.id}
                 primary={i === 0}
                 prepared={order.status === "prepared"}
                 title={

@@ -122,10 +122,13 @@ export const orderEvents = pgTable(
       .notNull()
       .references(() => orders.id, { onDelete: "cascade" }),
     at: timestamp({ withTimezone: true }).notNull().defaultNow(),
-    actor: actorEnum().notNull(),
+    actor: actorEnum(),
+    // Qui a agi, quand c'est une personne connectée. Le nom est copié, il reste lisible si le compte est supprimé.
+    userId: text().references(() => user.id, { onDelete: "set null" }),
+    userName: text(),
     kind: historyKindEnum().notNull(),
   },
-  (t) => [index().on(t.orderId)],
+  (t) => [index().on(t.orderId), check("event_has_author", sql`${t.actor} is not null or ${t.userName} is not null`)],
 );
 
 // Les relations disent à Drizzle comment joindre les tables (db.query.orders.findFirst({ with: { lines: true } })).

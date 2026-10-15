@@ -56,7 +56,8 @@
     "markDelivered": "Mark delivered",
     "markRefused": "Parcel refused",
     "restock": "Put back in stock",
-    "cancel": "Cancel order"
+    "cancel": "Cancel order",
+    "recordReturn": "Record a return"
   },
   "actionLong": {
     "confirm": "Confirm order",
@@ -279,7 +280,22 @@
     "more": "More",
     "online": "Online",
     "onlineHint": "Visible in the shop once saved",
-    "save": "Save product"
+    "save": "Save product",
+    "errorsSummary": "{count, plural, one {# field to fix} other {# fields to fix}} before saving.",
+    "saved": "Product saved.",
+    "errors": {
+      "required": "This field is required.",
+      "money": "Enter a price in dirhams, for example 180.",
+      "compareAtLow": "The compare-at price must be higher than the price.",
+      "tooLong": "That's too long.",
+      "stock": "Enter a whole stock number, 0 or more.",
+      "threshold": "Enter a whole number, 0 or more.",
+      "variantInUse": "A size that has already sold can't be removed. Set its stock to 0 instead.",
+      "forbidden": "Only the manager can edit products.",
+      "stockChanged": "The stock changed while you were editing, probably an order was just confirmed. Reload the page.",
+      "notFound": "This product no longer exists.",
+      "invalid": "This value isn't valid."
+    }
   },
   "customers": {
     "title": "Customers",
@@ -394,5 +410,28 @@
     "forbiddenTitle": "This page is for the manager only.",
     "forbiddenBody": "Your packer account gives access to the parcels to pack and ship.",
     "forbiddenLink": "Go to parcels"
+  },
+  "orderAction": {
+    "done": {
+      "confirm": "Order confirmed. It moves to To pack.",
+      "markPrepared": "Parcel packed. Waiting for the courier.",
+      "markShipped": "Parcel handed to the courier.",
+      "markDelivered": "Order delivered.",
+      "markRefused": "Parcel refused. Remember to put it back in stock.",
+      "restock": "Items put back in stock.",
+      "cancel": "Order cancelled.",
+      "recordReturn": "Return recorded. The items are back in stock."
+    },
+    "errors": {
+      "invalid": "This action isn't possible.",
+      "forbidden": "Your role doesn't allow this action.",
+      "conflict": "This order changed in the meantime. The page is up to date.",
+      "outOfStock": "Not enough stock to confirm. Restock the product first."
+    },
+    "confirm": {
+      "cancel": "Cancel this order? If it was confirmed, the stock will be put back.",
+      "markRefused": "Did the customer refuse the parcel?",
+      "recordReturn": "Did the customer send the order back? The items will go back into stock."
+    }
   }
 }

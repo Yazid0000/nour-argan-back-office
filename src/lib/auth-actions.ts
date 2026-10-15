@@ -1,27 +1,16 @@
 "use server";
 
 import { headers } from "next/headers";
-import { hasLocale } from "next-intl";
 import { redirect } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
 import { auth, demoAccounts } from "./auth";
 import { parseRole, roleHome } from "./domain";
-
-/**
- * La langue de la page qui a envoyé le formulaire (champ caché « locale »).
- * Dans une Server Action, Next ne fournit pas la langue de l'adresse (next/root-params).
- * On ne fait pas confiance au champ. Une valeur inconnue redevient le français.
- */
-function formLocale(form: FormData) {
-  const locale = form.get("locale");
-  return typeof locale === "string" && hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
-}
+import { formLocale } from "./form-locale";
 
 // L'e-mail tapé revient avec l'erreur, car React vide le formulaire après l'envoi.
 export type LoginState = { error: "missing" | "invalid" | "tooMany" | "demo"; email: string } | null;
 
 // Better Auth limite les essais seulement sur ses routes HTTP, pas quand on l'appelle depuis une action.
-// On compte donc nous-mêmes les échecs, par adresse IP et e-mail : 5 par minute au plus.
+// On compte donc nous-mêmes les échecs, par adresse IP et e-mail, 5 par minute au plus.
 // ponytail: compteur en mémoire, propre à chaque instance du serveur. Une table en base si un vrai site l'exige.
 const WINDOW_MS = 60_000;
 const MAX_FAILURES = 5;

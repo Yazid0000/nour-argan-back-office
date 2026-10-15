@@ -10,3 +10,6 @@ import * as schema from "./schema";
  * Le pilote WebSocket échouait souvent depuis le poste de dev (voir instrumentation.ts pour la cause).
  */
 export const db = drizzle({ client: neon(process.env.DATABASE_URL!), schema, casing: "snake_case" });
+
+/** Le code d'erreur Postgres. Drizzle l'enveloppe dans cause, sauf pour db.batch qui le laisse passer tel quel. */
+export const pgCode = (e: unknown) => (e as { cause?: { code?: string }; code?: string }).cause?.code ?? (e as { code?: string }).code;
