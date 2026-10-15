@@ -13,6 +13,23 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: photoHost ? [{ protocol: "https", hostname: photoHost, pathname: "/produits/**" }] : [],
   },
+  // En-têtes de sécurité sur toutes les réponses. frame-ancestors et X-Frame-Options empêchent d'afficher
+  // le back-office dans le cadre d'un autre site (clickjacking). Les scripts ne sont pas bloqués par la CSP,
+  // Next en écrit dans chaque page et les autoriser un par un rendrait toutes les pages dynamiques.
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+    ];
+  },
   // Pas de page d'accueil. On arrive directement sur la connexion, dans la bonne langue.
   async redirects() {
     return [

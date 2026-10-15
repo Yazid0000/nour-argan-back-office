@@ -9,7 +9,7 @@ import { products, variants } from "@/db/schema";
 import { redirect } from "@/i18n/navigation";
 import { categories } from "./domain";
 import { formLocale } from "./form-locale";
-import { MAX_PHOTOS, isPhotoUrl } from "./photos";
+import { MAX_PHOTOS, PHOTO_FOLDER, isPhotoUrl } from "./photos";
 import { ForbiddenError, requireRole } from "./session";
 
 /** Les messages d'erreur sont des codes, traduits dans l'interface (productForm.errors.*). */
@@ -82,7 +82,8 @@ async function deleteUnused(urls: string[]) {
   const list = sql.join(urls.map((u) => sql`${u}`), sql`, `);
   const used = await db.execute<{ url: string }>(sql`select distinct unnest(${products.photos}) as url from ${products} where ${products.photos} && array[${list}]::text[]`);
   const inUse = new Set(used.rows.map((r) => r.url));
-  const unused = urls.filter((u) => !inUse.has(u));
+  // Les photos de démo restent toujours, la remise à zéro de la nuit compte sur elles.
+  const unused = urls.filter((u) => !inUse.has(u) && !new URL(u).pathname.startsWith(`/${PHOTO_FOLDER}demo/`));
   if (unused.length) await del(unused).catch((e) => console.error("Photos non effacées", e));
 }
 

@@ -302,7 +302,7 @@
       "type": "Ce fichier n'est pas une photo. Choisis une image JPEG, PNG ou WebP.",
       "size": "Une photo ne peut pas dépasser 40 Mo.",
       "count": "{max} photos au plus par produit.",
-      "failed": "La photo n'a pas pu être envoyée. Vérifie ta connexion et réessaie."
+      "failed": "La photo n'a pas pu être envoyée. Vérifie ta connexion, ou réessaie dans un moment."
     },
     "addPhoto": "Ajouter une photo",
     "photoBatch": "Envoi des photos, {current} sur {total}",

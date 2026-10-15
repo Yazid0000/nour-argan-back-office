@@ -5,23 +5,14 @@ import { redirect } from "@/i18n/navigation";
 import { auth, demoAccounts } from "./auth";
 import { parseRole, roleHome } from "./domain";
 import { formLocale } from "./form-locale";
+import { clientIp, rateLimit } from "./rate-limit";
 
 // L'e-mail tapé revient avec l'erreur, car React vide le formulaire après l'envoi.
 export type LoginState = { error: "missing" | "invalid" | "tooMany" | "demo"; email: string } | null;
 
 // Better Auth limite les essais seulement sur ses routes HTTP, pas quand on l'appelle depuis une action.
 // On compte donc nous-mêmes les échecs, par adresse IP et e-mail, 5 par minute au plus.
-// ponytail: compteur en mémoire, propre à chaque instance du serveur. Une table en base si un vrai site l'exige.
-const WINDOW_MS = 60_000;
-const MAX_FAILURES = 5;
-const failures = new Map<string, number[]>();
-
-function recentFailures(key: string) {
-  const now = Date.now();
-  const list = (failures.get(key) ?? []).filter((t) => now - t < WINDOW_MS);
-  failures.set(key, list);
-  return list;
-}
+const failures = rateLimit(5, 60_000);
 
 /**
  * Connexion. Deux cas :
@@ -41,17 +32,16 @@ export async function signIn(_previous: LoginState, form: FormData): Promise<Log
   if (!email || !password) return { error: "missing", email };
 
   const requestHeaders = await headers();
-  const ip = requestHeaders.get("x-forwarded-for")?.split(",")[0].trim() ?? "local";
-  const key = `${ip}:${email.toLowerCase()}`;
+  const key = `${clientIp(requestHeaders)}:${email.toLowerCase()}`;
   // Les boutons démo n'envoient aucun mot de passe et ne peuvent pas servir à en deviner un. Pas de limite.
-  if (!isDemo && recentFailures(key).length >= MAX_FAILURES) return { error: "tooMany", email };
+  if (!isDemo && failures.reached(key)) return { error: "tooMany", email };
 
   let role;
   try {
     const result = await auth.api.signInEmail({ body: { email, password }, headers: requestHeaders });
     role = parseRole(result.user.role);
   } catch {
-    if (!isDemo) recentFailures(key).push(Date.now());
+    if (!isDemo) failures.record(key);
     if (isDemo) {
       // Un bouton démo qui échoue, c'est la démo qui n'est pas prête (base vide), pas le visiteur.
       console.error("Connexion démo refusée : la base a-t-elle été remplie (npm run db:seed) ?");
