@@ -18,7 +18,8 @@
     "preparer": "Packer",
     "account": "Account",
     "logout": "Log out",
-    "skip": "Skip to content"
+    "skip": "Skip to content",
+    "chartKeys": "Use the left and right arrows to read each day."
   },
   "nav": {
     "label": "Main navigation",

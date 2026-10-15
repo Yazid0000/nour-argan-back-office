@@ -17,6 +17,7 @@ import { type OrderTab, type Payment, isIrreversible, orderTabs, payments, railS
 import { dayKey, formatMoney, formatTime, formatWhen } from "@/lib/format";
 import { AutoSubmitSelect } from "./auto-submit-select";
 import { OrderActionForm } from "./order-action-form";
+import { AnimatedList, ListItem } from "./motion";
 import { ActionBar, EmptyState, Money, StatusPill, Swatch, buttonStyles, cx, inputStyles } from "./ui";
 
 export const paymentIcons: Record<Payment, typeof MoneyIcon> = { cod: MoneyIcon, card: CreditCardIcon, transfer: BankIcon };
@@ -114,12 +115,12 @@ export async function OrdersScreen({
             <>
               <p className="px-5 pt-3 pb-2 text-xs text-text-2 lg:hidden">{oldestFirst(tab) ? t("oldestFirst") : t("newestFirst")}</p>
 
-              <ul className="flex flex-col gap-2.5 px-4 pb-6 lg:hidden">
+              <AnimatedList key={`${tab} ${q} ${payment ?? ""}`} className="flex flex-col gap-2.5 px-4 pb-6 lg:hidden">
                 {rows.map((o) => {
                   const next = transitions[o.status].next;
                   const Icon = paymentIcons[o.payment];
                   return (
-                    <li key={o.id} className="relative rounded-lg border border-border bg-surface px-3.5 py-3">
+                    <ListItem key={o.id} className="relative rounded-lg border border-border bg-surface px-3.5 py-3">
                       <div className="flex justify-between font-mono text-xs text-text-2">
                         <span>#{o.number}</span>
                         <span>{formatWhen(o.createdAt, now, locale, when)}</span>
@@ -146,10 +147,10 @@ export async function OrdersScreen({
                           />
                         )}
                       </div>
-                    </li>
+                    </ListItem>
                   );
                 })}
-              </ul>
+              </AnimatedList>
 
               <div className="mt-4 hidden overflow-hidden rounded-lg border border-border bg-surface lg:block">
                 <table className="w-full text-sm">

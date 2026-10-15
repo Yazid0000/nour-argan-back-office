@@ -30,11 +30,10 @@ export function OrderActionForm({ orderId, buttons, className }: { orderId: stri
   return (
     <form action={action} className={cx("flex flex-wrap items-center gap-2.5", className)}>
       <input type="hidden" name="orderId" value={orderId} />
-      {message && (
-        <p role="status" className={cx("order-first basis-full text-[13px]", state?.ok ? "text-ok-fg" : "text-err-fg")}>
-          {message}
-        </p>
-      )}
+      {/* La zone d'annonce reste en place pour que les lecteurs d'écran lisent chaque nouveau message. La clé relance le fondu. */}
+      <p role="status" className={message ? cx("order-first basis-full text-[13px]", state?.ok ? "text-ok-fg" : "text-err-fg") : "sr-only"}>
+        {message && <span key={message} className="fade-in block">{message}</span>}
+      </p>
       {buttons.map((b) => (
         <button
           key={b.action}

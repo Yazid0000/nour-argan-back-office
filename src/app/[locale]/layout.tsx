@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { locale as rootLocale } from "next/root-params";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
+import { MotionRoot } from "@/components/motion";
 import { ThemeScript } from "@/components/theme-script";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
@@ -36,7 +37,9 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
         <ThemeScript />
       </head>
       <body>
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <MotionRoot>{children}</MotionRoot>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

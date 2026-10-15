@@ -1,6 +1,7 @@
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { ArrowClockwiseIcon, PackageIcon, SignOutIcon, TruckIcon } from "@phosphor-icons/react/ssr";
 import { LogoutButton } from "@/components/logout-button";
+import { AnimatedList, ListItem } from "@/components/motion";
 import { OrderActionForm } from "@/components/order-action-form";
 import { paymentIcons } from "@/components/orders";
 import { PrepCard } from "@/components/prep-card";
@@ -67,11 +68,11 @@ export default async function PreparationPage({ searchParams }: PageProps<"/[loc
           sent.orders.length === 0 ? (
             <EmptyState icon={<TruckIcon size={28} />} title={t("emptyShipped")} />
           ) : (
-            <ul className="flex flex-col gap-2.5">
+            <AnimatedList key="shipped" className="flex flex-col gap-2.5">
               {sent.orders.map((o) => {
                 const Icon = paymentIcons[o.payment];
                 return (
-                  <li key={o.id} className="rounded-lg border border-border bg-surface px-3.5 py-3">
+                  <ListItem key={o.id} className="rounded-lg border border-border bg-surface px-3.5 py-3">
                     <div className="flex items-baseline justify-between gap-3">
                       <h2 className="text-[15px]">
                         <span className="font-mono font-semibold">#{o.number}</span> <span className="font-semibold">{o.city}</span>
@@ -95,10 +96,10 @@ export default async function PreparationPage({ searchParams }: PageProps<"/[loc
                       className="mt-2.5"
                       buttons={[{ action: "markDelivered", label: action("markDelivered"), look: "outline", className: "h-11 w-full text-sm" }]}
                     />
-                  </li>
+                  </ListItem>
                 );
               })}
-            </ul>
+            </AnimatedList>
           )
         ) : toPack!.orders.length === 0 ? (
           <div className="flex flex-1 flex-col justify-center gap-4 px-1">
@@ -121,7 +122,7 @@ export default async function PreparationPage({ searchParams }: PageProps<"/[loc
             </Link>
           </div>
         ) : (
-          <ul className="flex flex-col gap-3">
+          <AnimatedList key="toPack" className="flex flex-col gap-3">
             {toPack!.orders.map(({ order, customer, lines, total }, i) => (
               <PrepCard
                 key={order.id}
@@ -143,7 +144,7 @@ export default async function PreparationPage({ searchParams }: PageProps<"/[loc
                 }))}
               />
             ))}
-          </ul>
+          </AnimatedList>
         )}
       </main>
     </div>

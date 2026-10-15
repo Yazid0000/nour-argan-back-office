@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { CheckIcon } from "@phosphor-icons/react/ssr";
+import { ListItem } from "./motion";
 import { OrderActionForm } from "./order-action-form";
 import { cx } from "./ui";
 
@@ -38,7 +39,7 @@ export function PrepCard({
     });
 
   return (
-    <li className="overflow-hidden rounded-lg border border-border bg-surface">
+    <ListItem className="overflow-hidden rounded-lg border border-border bg-surface">
       <div className="flex items-start justify-between gap-3 border-b border-border px-3.5 py-3">
         <div>
           <h2 className="text-[15px]">{title}</h2>
@@ -91,6 +92,6 @@ export function PrepCard({
           ]}
         />
       </div>
-    </li>
+    </ListItem>
   );
 }

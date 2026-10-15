@@ -18,7 +18,8 @@
     "preparer": "Préparateur",
     "account": "Compte",
     "logout": "Se déconnecter",
-    "skip": "Aller au contenu"
+    "skip": "Aller au contenu",
+    "chartKeys": "Flèches gauche et droite pour lire chaque jour."
   },
   "nav": {
     "label": "Navigation principale",
