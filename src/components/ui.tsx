@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { ArrowDownRightIcon, ArrowUpRightIcon } from "@phosphor-icons/react/ssr";
 import type { Cents, Currency, GaugeTone, Status } from "@/lib/domain";
@@ -60,8 +61,18 @@ export function StatusPill({ status }: { status: Status }) {
   return <Pill tone={statusTone[status]}>{t(status)}</Pill>;
 }
 
-/** Bloc rayé à la place de la photo produit, jusqu'à l'envoi des vraies photos (phase 5). */
-export function Swatch({ color, label, className }: { color: string; label: string; className?: string }) {
+/**
+ * La photo principale du produit, ou un bloc rayé de sa couleur s'il n'a pas encore de photo.
+ * sizes dit au navigateur la largeur affichée, Next envoie alors une image à la bonne taille.
+ */
+export function Swatch({ color, photo, label, className, sizes = "64px" }: { color: string; photo?: string; label: string; className?: string; sizes?: string }) {
+  if (photo) {
+    return (
+      <div className={cx("relative flex-none overflow-hidden rounded-lg bg-bg", className ?? "size-11")}>
+        <Image src={photo} alt={label} fill sizes={sizes} className="object-cover" />
+      </div>
+    );
+  }
   return (
     <div
       role="img"

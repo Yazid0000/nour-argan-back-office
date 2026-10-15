@@ -139,7 +139,7 @@ export default async function PreparationPage({ searchParams }: PageProps<"/[loc
                   name: l.product.name[locale],
                   label: l.variant.label,
                   qty: l.qty,
-                  swatch: <Swatch color={l.product.swatch} label={l.product.name[locale]} className="size-10" />,
+                  swatch: <Swatch color={l.product.swatch} photo={l.product.photo} label={l.product.name[locale]} className="size-10" />,
                 }))}
               />
             ))}

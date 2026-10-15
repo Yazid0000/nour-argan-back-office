@@ -40,8 +40,10 @@ export type Product = {
   /** Alerte quand un format passe à ce stock ou en dessous. */
   threshold: number;
   online: boolean;
-  /** Couleur du bloc rayé qui remplace la photo en attendant la phase 5. */
+  /** Couleur du bloc rayé affiché quand le produit n'a pas encore de photo. */
   swatch: string;
+  /** Adresses des photos, la première est la principale. 8 au plus. */
+  photos: string[];
   variants: Variant[];
 };
 

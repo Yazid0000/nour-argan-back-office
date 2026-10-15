@@ -256,7 +256,6 @@
     "editTitle": "Modifier le produit",
     "breadcrumbNew": "nouveau",
     "photos": "Photos",
-    "takePhoto": "Prendre une photo",
     "main": "Principale",
     "photosHint": "La photo principale s'affiche dans la boutique.",
     "name": "Nom du produit",
@@ -295,7 +294,18 @@
       "stockChanged": "Le stock a changé pendant ta modification, une commande vient sans doute d'être confirmée. Recharge la page.",
       "notFound": "Ce produit n'existe plus.",
       "invalid": "Cette valeur n'est pas valable."
-    }
+    },
+    "photoMakeMain": "Mettre la photo {n} en principale",
+    "photoRemove": "Retirer la photo {n}",
+    "photoErrors": {
+      "type": "Ce fichier n'est pas une photo. Choisis une image JPEG, PNG ou WebP.",
+      "size": "Une photo ne peut pas dépasser 40 Mo.",
+      "count": "{max} photos au plus par produit.",
+      "failed": "La photo n'a pas pu être envoyée. Vérifie ta connexion et réessaie."
+    },
+    "addPhoto": "Ajouter une photo",
+    "photoBatch": "Envoi des photos, {current} sur {total}",
+    "photoWaiting": "En attente"
   },
   "customers": {
     "title": "Clients",

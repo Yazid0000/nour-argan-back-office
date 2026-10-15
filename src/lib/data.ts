@@ -116,6 +116,7 @@ function toProduct(p: ProductRow): Product {
     threshold: p.threshold,
     online: p.online,
     swatch: p.swatch,
+    photos: p.photos,
     variants: [...p.variants]
       .sort((a, b) => a.position - b.position)
       .map((v) => ({ id: v.id, label: v.label, price: v.price, stock: v.stock, restockLevel: v.restockLevel })),
@@ -128,11 +129,11 @@ async function allProducts() {
   return rows.map(toProduct);
 }
 
-/** Ce qu'il faut pour afficher une ligne de commande, le produit (nom, couleur) et le format. */
-const lineWith = { product: { columns: { id: true, nameFr: true, nameEn: true, swatch: true } }, variant: true } as const;
+/** Ce qu'il faut pour afficher une ligne de commande, le produit (nom, couleur, photos) et le format. */
+const lineWith = { product: { columns: { id: true, nameFr: true, nameEn: true, swatch: true, photos: true } }, variant: true } as const;
 
 type LineRow = typeof orderLines.$inferSelect & {
-  product: Pick<typeof products.$inferSelect, "id" | "nameFr" | "nameEn" | "swatch">;
+  product: Pick<typeof products.$inferSelect, "id" | "nameFr" | "nameEn" | "swatch" | "photos">;
   variant: typeof variants.$inferSelect;
 };
 
@@ -141,7 +142,7 @@ const toLine = (l: LineRow) => ({
   variantId: l.variantId,
   qty: l.qty,
   unitPrice: l.unitPrice,
-  product: { id: l.product.id, name: { fr: l.product.nameFr, en: l.product.nameEn }, swatch: l.product.swatch },
+  product: { id: l.product.id, name: { fr: l.product.nameFr, en: l.product.nameEn }, swatch: l.product.swatch, photo: l.product.photos[0] },
   variant: { id: l.variant.id, label: l.variant.label },
 });
 

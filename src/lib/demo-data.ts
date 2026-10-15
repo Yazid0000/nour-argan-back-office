@@ -44,6 +44,7 @@ function product(
     description,
     category,
     swatch,
+    photos: [],
     threshold,
     price: (extra.price ?? variants[0][1]) * 100,
     compareAtPrice: extra.compareAt ? extra.compareAt * 100 : null,

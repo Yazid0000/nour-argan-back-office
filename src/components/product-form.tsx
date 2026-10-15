@@ -2,13 +2,13 @@
 
 import { type FormEvent, type ReactNode, startTransition, useActionState, useId, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { CameraIcon, CaretDownIcon, CheckCircleIcon, MinusIcon, PlusIcon, TrashIcon, WarningCircleIcon, XIcon } from "@phosphor-icons/react/ssr";
+import { CaretDownIcon, CheckCircleIcon, MinusIcon, PlusIcon, TrashIcon, WarningCircleIcon, XIcon } from "@phosphor-icons/react/ssr";
 import { Link } from "@/i18n/navigation";
 import { type Category, type Product, categories } from "@/lib/domain";
 import { type ProductFormState, saveProduct } from "@/lib/product-actions";
-import { ActionBar, Swatch, Switch, buttonStyles, cx, inputStyles } from "./ui";
+import { PhotoPicker } from "./photo-picker";
+import { ActionBar, Switch, buttonStyles, cx, inputStyles } from "./ui";
 
-const MAX_PHOTOS = 8;
 const toMad = (cents: number) => String(cents / 100);
 
 // id est celui du format en base, vide pour un format ajouté dans le formulaire.
@@ -72,59 +72,14 @@ export function ProductForm({ product, saved = false }: { product?: Product; sav
       : [{ key: "new-1", id: "", label: "", price: "", stock: "", stockWas: "" }],
   );
   const [threshold, setThreshold] = useState(product?.threshold ?? 10);
-  const [photos, setPhotos] = useState<string[]>([]);
-  const existingPhotos = product ? 2 : 0;
-  const photoCount = existingPhotos + photos.length;
+  const [uploading, setUploading] = useState(false);
 
   const update = (key: string, field: keyof Row, value: string) =>
     setRows((rs) => rs.map((r) => (r.key === key ? { ...r, [field]: value } : r)));
 
-  const photoTile = "relative aspect-square w-[88px] flex-none overflow-hidden rounded-lg lg:w-24";
-
-  const photosBlock = (
-    <section className="flex flex-col gap-2">
-      <div className="flex items-baseline justify-between">
-        <h2 className="text-sm font-medium">{t("photos")}</h2>
-        <span className="font-mono text-xs text-text-2">{photoCount} / {MAX_PHOTOS}</span>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <label className={cx(photoTile, "flex cursor-pointer flex-col items-center justify-center gap-1.5 border border-dashed border-text-2 bg-surface text-center text-xs font-medium focus-within:outline-2 focus-within:outline-accent")}>
-          <CameraIcon aria-hidden size={20} />
-          {t("takePhoto")}
-          {/* Avec capture, le téléphone ouvre directement l'appareil photo. */}
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            multiple
-            className="sr-only"
-            onChange={(e) => {
-              const files = [...(e.target.files ?? [])].slice(0, MAX_PHOTOS - photoCount);
-              setPhotos((p) => [...p, ...files.map((f) => URL.createObjectURL(f))]);
-            }}
-          />
-        </label>
-        {product &&
-          [0, 1].map((i) => (
-            <div key={i} className={photoTile}>
-              <Swatch color={product.swatch} label={product.name[locale]} className={cx("size-full", i === 1 && "opacity-80")} />
-              {i === 0 && <span className="absolute top-1.5 left-1.5 rounded bg-surface px-1.5 py-0.5 text-[11px] font-semibold">{t("main")}</span>}
-            </div>
-          ))}
-        {photos.map((src, i) => (
-          <div key={src} className={photoTile}>
-            {/* Aperçu local seulement, l'envoi au serveur arrive à la phase 5. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} alt="" className="size-full object-cover" />
-            {i === 0 && existingPhotos === 0 && (
-              <span className="absolute top-1.5 left-1.5 rounded bg-surface px-1.5 py-0.5 text-[11px] font-semibold">{t("main")}</span>
-            )}
-          </div>
-        ))}
-      </div>
-      <p className="text-xs text-text-2">{t("photosHint")}</p>
-    </section>
-  );
+  // Une adresse refusée arrive sous « photos.2 », on l'affiche sous le bloc photos.
+  const photoKey = Object.keys(errors).find((k) => k.startsWith("photos"));
+  const photosBlock = <PhotoPicker initial={product?.photos ?? []} error={photoKey && err(photoKey)} onBusyChange={setUploading} />;
 
   const variantKey = Object.keys(errors).find((k) => k.startsWith("variants"));
   const variantError = variantKey ? errors[variantKey] : undefined;
@@ -254,7 +209,7 @@ export function ProductForm({ product, saved = false }: { product?: Product; sav
   );
 
   const save = (
-    <button type="submit" disabled={pending} className={cx(buttonStyles.primary, "h-[52px] w-full text-base lg:h-11 lg:w-auto lg:text-[15px]")}>
+    <button type="submit" disabled={pending || uploading} className={cx(buttonStyles.primary, "h-[52px] w-full text-base lg:h-11 lg:w-auto lg:text-[15px]")}>
       {t("save")}
     </button>
   );

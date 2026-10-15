@@ -30,6 +30,8 @@ export const products = pgTable(
     threshold: integer().notNull().default(10),
     online: boolean().notNull().default(true),
     swatch: text().notNull(),
+    // Adresses des photos dans Vercel Blob, dans l'ordre. La première est la photo principale.
+    photos: text().array().notNull().default(sql`'{}'::text[]`),
     createdAt: createdAt(),
   },
   (t) => [

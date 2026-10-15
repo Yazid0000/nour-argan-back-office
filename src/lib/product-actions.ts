@@ -2,12 +2,14 @@
 
 import { randomBytes } from "node:crypto";
 import { eq, sql } from "drizzle-orm";
+import { del } from "@vercel/blob";
 import { z } from "zod";
 import { db, pgCode } from "@/db";
 import { products, variants } from "@/db/schema";
 import { redirect } from "@/i18n/navigation";
 import { categories } from "./domain";
 import { formLocale } from "./form-locale";
+import { MAX_PHOTOS, isPhotoUrl } from "./photos";
 import { ForbiddenError, requireRole } from "./session";
 
 /** Les messages d'erreur sont des codes, traduits dans l'interface (productForm.errors.*). */
@@ -45,6 +47,11 @@ const product = z
     threshold: z.string().trim().regex(/^\d{1,3}$/, "threshold").transform(Number),
     online: z.boolean(),
     variants: z.array(variant).min(1, "required").max(10),
+    // Seulement des adresses de notre espace Vercel Blob, envoyées par le sélecteur de photos.
+    photos: z
+      .array(z.string().refine(isPhotoUrl))
+      .max(MAX_PHOTOS)
+      .refine((urls) => new Set(urls).size === urls.length),
   })
   .refine((p) => p.compareAtPrice === "" || p.compareAtPrice > p.price, { path: ["compareAtPrice"], message: "compareAtLow" });
 
@@ -68,6 +75,22 @@ const text = (form: FormData, key: string) => {
 const randomId = () => randomBytes(4).toString("hex");
 const slug = (s: string) =>
   s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
+
+/** Efface de Vercel Blob les photos qu'aucun produit n'utilise. Un échec laisse juste un fichier orphelin. */
+async function deleteUnused(urls: string[]) {
+  if (urls.length === 0) return;
+  const list = sql.join(urls.map((u) => sql`${u}`), sql`, `);
+  const used = await db.execute<{ url: string }>(sql`select distinct unnest(${products.photos}) as url from ${products} where ${products.photos} && array[${list}]::text[]`);
+  const inUse = new Set(used.rows.map((r) => r.url));
+  const unused = urls.filter((u) => !inUse.has(u));
+  if (unused.length) await del(unused).catch((e) => console.error("Photos non effacées", e));
+}
+
+/** Une photo envoyée puis retirée avant d'enregistrer le produit. On l'efface tout de suite. */
+export async function discardPhoto(url: string) {
+  await requireRole("manager");
+  if (isPhotoUrl(url)) await deleteUnused([url]);
+}
 
 /**
  * Le stock tapé n'est écrit que s'il a changé, et seulement si la base a toujours le stock lu au chargement.
@@ -103,6 +126,7 @@ export async function saveProduct(_previous: ProductFormState, form: FormData): 
     threshold: text(form, "threshold"),
     online: form.get("online") === "on",
     variants: readVariants(form).map((v) => ({ ...v, id: v.id || undefined, stockWas: v.stockWas || undefined })),
+    photos: form.getAll("photos").filter((v) => typeof v === "string"),
   });
   if (!parsed.success) {
     // Une erreur par champ, nommée comme le champ (« price », « variants.1.stock »).
@@ -114,9 +138,11 @@ export async function saveProduct(_previous: ProductFormState, form: FormData): 
   const id = p.id ?? `${slug(p.nameFr) || "produit"}-${randomId()}`;
 
   // En modification, on ne touche qu'aux formats de CE produit. Un id venu d'ailleurs est ignoré.
-  const existing = p.id ? await db.select({ id: variants.id }).from(variants).where(eq(variants.productId, p.id)) : [];
-  if (p.id && existing.length === 0) return { errors: { form: "notFound" } };
-  const owned = new Set(existing.map((v) => v.id));
+  const before = p.id
+    ? await db.query.products.findFirst({ where: eq(products.id, p.id), columns: { photos: true }, with: { variants: { columns: { id: true } } } })
+    : undefined;
+  if (p.id && !before) return { errors: { form: "notFound" } };
+  const owned = new Set(before?.variants.map((v) => v.id));
   const kept = new Set(p.variants.flatMap((v) => (v.id && owned.has(v.id) ? [v.id] : [])));
   const removed = [...owned].filter((v) => !kept.has(v));
 
@@ -129,6 +155,7 @@ export async function saveProduct(_previous: ProductFormState, form: FormData): 
     compareAtPrice: p.compareAtPrice === "" ? null : p.compareAtPrice,
     threshold: p.threshold,
     online: p.online,
+    photos: p.photos,
   };
 
   try {
@@ -152,6 +179,10 @@ export async function saveProduct(_previous: ProductFormState, form: FormData): 
     if (pgCode(e) === "23514") return { errors: { variants: "stockChanged" } };
     throw e;
   }
+
+  // Les photos retirées ne servent plus à rien, on les efface de Vercel Blob une fois le produit enregistré.
+  // Un échec ici laisse juste un fichier orphelin, le produit est déjà à jour.
+  await deleteUnused((before?.photos ?? []).filter((url) => !p.photos.includes(url)));
 
   return redirect({ href: `/app/produits/${id}?enregistre=1`, locale: formLocale(form) });
 }

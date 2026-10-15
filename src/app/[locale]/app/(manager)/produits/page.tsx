@@ -71,7 +71,7 @@ export default async function ProductsPage({ searchParams }: PageProps<"/[locale
               return (
                 <li key={p.id}>
                   <Link href={`/app/produits/${p.id}`} className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface">
-                    <Swatch color={p.swatch} label={p.name[locale]} className="aspect-square w-full rounded-none" />
+                    <Swatch color={p.swatch} photo={p.photos[0]} label={p.name[locale]} className="aspect-square w-full rounded-none" sizes="50vw" />
                     <div className="flex flex-1 flex-col gap-1 p-3">
                       <div className="text-sm leading-snug font-medium">
                         {p.name[locale]} {main.label && <span className="font-normal text-text-2">{main.label}</span>}
@@ -114,7 +114,7 @@ export default async function ProductsPage({ searchParams }: PageProps<"/[locale
                     <tr key={p.id} className="relative border-t border-border hover:bg-bg [&>td]:px-3 [&>td]:py-2.5">
                       <td>
                         <div className="flex items-center gap-3">
-                          <Swatch color={p.swatch} label={p.name[locale]} className="size-9" />
+                          <Swatch color={p.swatch} photo={p.photos[0]} label={p.name[locale]} className="size-9" />
                           <div>
                             <Link href={`/app/produits/${p.id}`} className="font-medium after:absolute after:inset-0">
                               {p.name[locale]}

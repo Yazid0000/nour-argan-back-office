@@ -1,0 +1,1 @@
+ALTER TABLE "products" ADD COLUMN "photos" text[] DEFAULT '{}'::text[] NOT NULL;

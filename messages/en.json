@@ -256,7 +256,6 @@
     "editTitle": "Edit product",
     "breadcrumbNew": "new",
     "photos": "Photos",
-    "takePhoto": "Take a photo",
     "main": "Main",
     "photosHint": "The main photo shows in the shop.",
     "name": "Product name",
@@ -295,7 +294,18 @@
       "stockChanged": "The stock changed while you were editing, probably an order was just confirmed. Reload the page.",
       "notFound": "This product no longer exists.",
       "invalid": "This value isn't valid."
-    }
+    },
+    "photoMakeMain": "Make photo {n} the main one",
+    "photoRemove": "Remove photo {n}",
+    "photoErrors": {
+      "type": "This file isn't a photo. Pick a JPEG, PNG or WebP image.",
+      "size": "A photo can't be larger than 40 MB.",
+      "count": "{max} photos at most per product.",
+      "failed": "The photo couldn't be uploaded. Check your connection and try again."
+    },
+    "addPhoto": "Add a photo",
+    "photoBatch": "Uploading photos, {current} of {total}",
+    "photoWaiting": "Waiting"
   },
   "customers": {
     "title": "Customers",

@@ -124,7 +124,7 @@ export default async function TodayPage() {
                     className="flex items-center gap-3 border-border px-3.5 py-2.5 not-first:border-t hover:bg-bg"
                   >
                     <span className="w-3.5 font-mono text-[13px] text-text-2">{i + 1}</span>
-                    <Swatch color={p.product.swatch} label={p.product.name[locale]} />
+                    <Swatch color={p.product.swatch} photo={p.product.photos[0]} label={p.product.name[locale]} />
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-sm font-medium">{p.product.name[locale]}</div>
                       <div className="font-mono text-xs text-text-2">
