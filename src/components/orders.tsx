@@ -18,6 +18,7 @@ import { dayKey, formatMoney, formatTime, formatWhen } from "@/lib/format";
 import { AutoSubmitSelect } from "./auto-submit-select";
 import { OrderActionForm } from "./order-action-form";
 import { AnimatedList, ListItem } from "./motion";
+import { NoteForm } from "./note-form";
 import { ActionBar, EmptyState, Money, StatusPill, Swatch, buttonStyles, cx, inputStyles } from "./ui";
 
 export const paymentIcons: Record<Payment, typeof MoneyIcon> = { cod: MoneyIcon, card: CreditCardIcon, transfer: BankIcon };
@@ -143,7 +144,7 @@ export async function OrdersScreen({
                           <OrderActionForm
                             orderId={o.id}
                             className="relative z-10 justify-end"
-                            buttons={[{ action: next, label: action(next), look: "outline", className: "h-11 text-sm" }]}
+                            buttons={[{ action: next, label: action(next), look: "outline", className: "min-h-11 text-sm" }]}
                           />
                         )}
                       </div>
@@ -289,10 +290,10 @@ export async function OrderDetail({ id, backHref }: { id: string; backHref: stri
           <p className="text-base font-semibold">{customer.name}</p>
           <p className="font-mono text-[15px]">{customer.phone}</p>
           <div className="mt-2.5 hidden grid-cols-2 gap-2 lg:grid">
-            <a href={phoneHref(customer.phone)} className={cx(buttonStyles.secondary, "h-11 text-sm")}>
+            <a href={phoneHref(customer.phone)} className={cx(buttonStyles.secondary, "min-h-11 text-sm")}>
               <PhoneIcon aria-hidden size={18} />{t("call")}
             </a>
-            <a href={whatsappHref(customer.phone)} target="_blank" rel="noreferrer" className={cx(buttonStyles.secondary, "h-11 text-sm")}>
+            <a href={whatsappHref(customer.phone)} target="_blank" rel="noreferrer" className={cx(buttonStyles.secondary, "min-h-11 text-sm")}>
               <WhatsappLogoIcon aria-hidden size={18} />{t("whatsapp")}
             </a>
           </div>
@@ -356,14 +357,7 @@ export async function OrderDetail({ id, backHref }: { id: string; backHref: stri
         </Section>
 
         <Section title={t("note")}>
-          <label className="sr-only" htmlFor={`note-${order.id}`}>{t("note")}</label>
-          <textarea
-            id={`note-${order.id}`}
-            defaultValue={order.note ?? ""}
-            placeholder={t("notePlaceholder")}
-            rows={2}
-            className="w-full rounded-lg border border-border bg-surface px-3.5 py-3 text-[15px] placeholder:text-text-2"
-          />
+          <NoteForm kind="order" id={order.id} note={order.note} label={t("note")} placeholder={t("notePlaceholder")} />
         </Section>
 
         {others.length > 0 && (
@@ -385,7 +379,7 @@ export async function OrderDetail({ id, backHref }: { id: string; backHref: stri
               {
                 action: next,
                 look: "primary",
-                className: "h-[52px] w-full text-base lg:h-12",
+                className: "min-h-[52px] w-full text-base lg:min-h-12",
                 label: (
                   <>
                     <CheckIcon aria-hidden size={18} weight="bold" />

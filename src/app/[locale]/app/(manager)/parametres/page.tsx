@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import type { Icon } from "@phosphor-icons/react";
 import {
-  ArrowClockwiseIcon,
   BellIcon,
   CaretRightIcon,
   ChartBarIcon,
@@ -12,8 +11,9 @@ import {
   UsersIcon,
   WalletIcon,
 } from "@phosphor-icons/react/ssr";
+import { ResetDemoButton } from "@/components/reset-demo-button";
 import { ThemeSelect } from "@/components/theme-select";
-import { Card, PageHeader, Switch, buttonStyles, cx, inputStyles } from "@/components/ui";
+import { Card, PageHeader, cx } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import { LogoutButton } from "@/components/logout-button";
 import { getCustomerCount, getSettings, getStats } from "@/lib/data";
@@ -61,25 +61,27 @@ export default async function SettingsPage() {
     { id: "equipe", icon: UserCirclePlusIcon, title: t("team"), hint: t("teamHint") },
     { id: "notifications", icon: BellIcon, title: t("notifications"), hint: t("notificationsHint") },
   ];
-  const field = (id: string, label: string, value: string, mono = false) => (
-    <div className="flex flex-col gap-2">
-      <label htmlFor={id} className="text-sm font-medium">{label}</label>
-      <input id={id} name={id} defaultValue={value} className={cx(inputStyles, mono && "font-mono")} />
+  // Dans la démo, les réglages de la boutique se lisent sans se modifier. Pas de faux champ ni de faux bouton.
+  const field = (label: string, value: string, mono = false) => (
+    <div className="flex flex-col gap-1">
+      <dt className="text-[13px] text-text-2">{label}</dt>
+      <dd className={cx("text-[15px] font-medium", mono && "font-mono")}>{value}</dd>
+    </div>
+  );
+  const setting = (label: string, on: boolean, hint?: string) => (
+    <div className="flex min-h-14 items-center justify-between gap-4 px-4 py-2.5">
+      <dt>
+        <span className="block text-sm font-medium">{label}</span>
+        {hint && <span className="block text-xs text-text-2">{hint}</span>}
+      </dt>
+      <dd className={cx("flex-none text-sm font-medium", on ? "text-ok-fg" : "text-text-2")}>{t(on ? "on" : "off")}</dd>
     </div>
   );
 
   return (
     <>
-      <PageHeader
-        overline={common("brand")}
-        title={t("title")}
-        action={
-          // L'enregistrement des réglages n'est dans aucune phase prévue, le bouton reste décoratif.
-          <div className="hidden lg:block">
-            <button type="button" className={cx(buttonStyles.primary, "h-11 text-[15px]")}>{common("save")}</button>
-          </div>
-        }
-      />
+      <PageHeader overline={common("brand")} title={t("title")} />
+      <p className="-mt-2 px-5 pb-4 text-sm text-text-2 lg:px-10">{t("readOnly")}</p>
 
       <div className="flex flex-col gap-[18px] px-4 pb-8 lg:grid lg:grid-cols-[200px_minmax(0,720px)] lg:gap-8 lg:px-10">
         {/* Sur mobile, cette page sert aussi d'onglet « Plus » vers Clients et Statistiques. */}
@@ -112,11 +114,13 @@ export default async function SettingsPage() {
 
         <div className="flex flex-col gap-7">
           <Section id="boutique" title={t("shop")}>
-            <Card className="grid gap-4 p-4 sm:grid-cols-2">
-              {field("shopName", t("shopName"), s.shop.name)}
-              {field("whatsapp", t("whatsapp"), s.shop.whatsapp, true)}
-              {field("email", t("email"), s.shop.email)}
-              {field("city", t("city"), s.shop.city)}
+            <Card>
+              <dl className="grid gap-4 p-4 sm:grid-cols-2">
+                {field(t("shopName"), s.shop.name)}
+                {field(t("whatsapp"), s.shop.whatsapp, true)}
+                {field(t("email"), s.shop.email)}
+                {field(t("city"), s.shop.city)}
+              </dl>
             </Card>
           </Section>
 
@@ -130,20 +134,17 @@ export default async function SettingsPage() {
                   </li>
                 ))}
               </ul>
-              <Switch
-                name="freeShipping"
-                defaultChecked={s.freeShippingFrom !== null}
-                label={t("freeShipping")}
-                hint={t("freeFrom", { amount: money(s.freeShippingFrom ?? 0) })}
-              />
+              <dl>{setting(t("freeShipping"), s.freeShippingFrom !== null, t("freeFrom", { amount: money(s.freeShippingFrom ?? 0) }))}</dl>
             </Card>
           </Section>
 
           <Section id="paiement" title={t("payment")}>
-            <Card className="divide-y divide-border">
-              <Switch name="cod" defaultChecked={s.payments.cod} label={t("cod")} hint={t("codHint")} />
-              <Switch name="transfer" defaultChecked={s.payments.transfer} label={t("transfer")} hint={t("transferHint")} />
-              <Switch name="card" defaultChecked={s.payments.card} label={t("card")} hint={t("cardHint")} />
+            <Card>
+              <dl className="divide-y divide-border">
+                {setting(t("cod"), s.payments.cod, t("codHint"))}
+                {setting(t("transfer"), s.payments.transfer, t("transferHint"))}
+                {setting(t("card"), s.payments.card, t("cardHint"))}
+              </dl>
             </Card>
           </Section>
 
@@ -161,18 +162,16 @@ export default async function SettingsPage() {
                   </li>
                 ))}
               </ul>
-              <button type="button" className="flex min-h-12 w-full items-center gap-2 px-4 text-sm font-medium text-accent">
-                <UserCirclePlusIcon aria-hidden size={18} />
-                {t("invite")}
-              </button>
             </Card>
           </Section>
 
           <Section id="notifications" title={t("notifications")}>
-            <Card className="divide-y divide-border">
-              <Switch name="newOrder" defaultChecked={s.notifications.newOrder} label={t("notifyNewOrder")} />
-              <Switch name="lowStock" defaultChecked={s.notifications.lowStock} label={t("notifyLowStock")} />
-              <Switch name="dailySummary" defaultChecked={s.notifications.dailySummary} label={t("notifyDaily")} />
+            <Card>
+              <dl className="divide-y divide-border">
+                {setting(t("notifyNewOrder"), s.notifications.newOrder)}
+                {setting(t("notifyLowStock"), s.notifications.lowStock)}
+                {setting(t("notifyDaily"), s.notifications.dailySummary)}
+              </dl>
             </Card>
           </Section>
 
@@ -204,11 +203,7 @@ export default async function SettingsPage() {
           <Section id="demo" title={t("demo")}>
             <Card className="flex flex-col items-start gap-3 p-4">
               <p className="text-sm text-text-2">{t("resetHint")}</p>
-              {/* Branché à la phase 6, avec la remise à zéro de chaque nuit. */}
-              <button type="button" className={cx(buttonStyles.secondary, "h-11 text-sm")}>
-                <ArrowClockwiseIcon aria-hidden size={16} />
-                {t("reset")}
-              </button>
+              <ResetDemoButton />
             </Card>
           </Section>
 

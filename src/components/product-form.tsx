@@ -209,7 +209,7 @@ export function ProductForm({ product, saved = false }: { product?: Product; sav
   );
 
   const save = (
-    <button type="submit" disabled={pending || uploading} className={cx(buttonStyles.primary, "h-[52px] w-full text-base lg:h-11 lg:w-auto lg:text-[15px]")}>
+    <button type="submit" disabled={pending || uploading} className={cx(buttonStyles.primary, "min-h-[52px] w-full text-base lg:min-h-11 lg:w-auto lg:text-[15px]")}>
       {t("save")}
     </button>
   );
@@ -237,7 +237,7 @@ export function ProductForm({ product, saved = false }: { product?: Product; sav
           </div>
         </div>
         <div className="hidden gap-2.5 lg:flex">
-          <Link href="/app/produits" className={cx(buttonStyles.secondary, "h-11 text-[15px]")}>{common("cancel")}</Link>
+          <Link href="/app/produits" className={cx(buttonStyles.secondary, "min-h-11 text-[15px]")}>{common("cancel")}</Link>
           {save}
         </div>
       </header>

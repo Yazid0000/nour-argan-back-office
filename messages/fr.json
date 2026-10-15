@@ -391,7 +391,6 @@
     "cardHint": "Il faut un compte CMI",
     "team": "Équipe",
     "teamHint": "2 personnes",
-    "invite": "Inviter quelqu'un",
     "notifications": "Notifications",
     "notificationsHint": "Nouvelles commandes, stock faible",
     "notifyNewOrder": "Nouvelle commande",
@@ -409,7 +408,13 @@
     "themeDark": "Sombre",
     "demo": "Démo",
     "reset": "Réinitialiser les données de démo",
-    "resetHint": "Remet commandes, produits et stock comme au départ. Fait aussi chaque nuit."
+    "resetHint": "Remet commandes, produits et stock comme au départ. Fait aussi chaque nuit.",
+    "readOnly": "Dans la démo, les réglages de la boutique sont en lecture seule. La langue, le thème et la remise à zéro fonctionnent.",
+    "on": "Activé",
+    "off": "Désactivé",
+    "resetConfirm": "Tout remettre à zéro pour tout le monde ? Ta session sera fermée.",
+    "resetting": "Remise à zéro…",
+    "resetTooMany": "Déjà fait plusieurs fois cette heure-ci. Réessaie plus tard."
   },
   "states": {
     "loading": "Chargement",
@@ -443,6 +448,15 @@
       "cancel": "Annuler cette commande ? Si elle était confirmée, le stock sera remis.",
       "markRefused": "Le client a refusé le colis ?",
       "recordReturn": "Le client a renvoyé sa commande ? Les articles seront remis en stock."
+    }
+  },
+  "note": {
+    "save": "Enregistrer la note",
+    "saved": "Note enregistrée.",
+    "errors": {
+      "invalid": "Une note fait 500 caractères au plus.",
+      "forbidden": "Seule la gérante peut modifier les notes.",
+      "notFound": "Introuvable. La démo a peut-être été remise à zéro, recharge la page."
     }
   }
 }

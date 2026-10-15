@@ -10,7 +10,7 @@ export function AccessDenied() {
     <div className="lg:px-10">
       <EmptyState icon={<LockSimpleIcon size={28} />} title={t("forbiddenTitle")}>
         <p className="max-w-sm">{t("forbiddenBody")}</p>
-        <Link href="/app/preparation" className={cx(buttonStyles.primary, "mt-4 h-11")}>
+        <Link href="/app/preparation" className={cx(buttonStyles.primary, "mt-4 min-h-11")}>
           {t("forbiddenLink")}
         </Link>
       </EmptyState>

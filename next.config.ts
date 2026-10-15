@@ -7,8 +7,11 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   reactCompiler: true,
-  // Le cron lit les photos de démo sur le disque, pour les renvoyer dans Blob si elles y manquent.
-  outputFileTracingIncludes: { "/api/cron/reset": ["./src/db/demo-photos/*.jpg"] },
+  // Le cron et le bouton « Réinitialiser » lisent les photos de démo sur le disque, pour les renvoyer dans Blob si elles y manquent.
+  outputFileTracingIncludes: {
+    "/api/cron/reset": ["./src/db/demo-photos/*.jpg"],
+    "/[locale]/app/parametres": ["./src/db/demo-photos/*.jpg"],
+  },
   // Next ne redimensionne que les images de notre espace Vercel Blob, rangées dans produits/.
   images: {
     remotePatterns: photoHost ? [{ protocol: "https", hostname: photoHost, pathname: "/produits/**" }] : [],

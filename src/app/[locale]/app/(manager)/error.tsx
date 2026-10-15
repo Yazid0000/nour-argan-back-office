@@ -10,7 +10,7 @@ export default function Error({ retry }: { error: Error & { digest?: string }; r
     <div className="px-0 lg:px-10">
       <EmptyState icon={<WarningCircleIcon size={28} />} title={t("errorTitle")}>
         <p className="max-w-sm">{t("errorBody")}</p>
-        <button type="button" onClick={retry} className={cx(buttonStyles.secondary, "mt-4 h-11")}>
+        <button type="button" onClick={retry} className={cx(buttonStyles.secondary, "mt-4 min-h-11")}>
           {t("retry")}
         </button>
       </EmptyState>

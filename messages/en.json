@@ -391,7 +391,6 @@
     "cardHint": "Needs a CMI account",
     "team": "Team",
     "teamHint": "2 people",
-    "invite": "Invite someone",
     "notifications": "Notifications",
     "notificationsHint": "New orders, low stock",
     "notifyNewOrder": "New order",
@@ -409,7 +408,13 @@
     "themeDark": "Dark",
     "demo": "Demo",
     "reset": "Reset demo data",
-    "resetHint": "Puts orders, products and stock back to the start. Also done every night."
+    "resetHint": "Puts orders, products and stock back to the start. Also done every night.",
+    "readOnly": "In the demo, shop settings are read-only. Language, theme and reset work.",
+    "on": "On",
+    "off": "Off",
+    "resetConfirm": "Reset everything for everyone? Your session will end.",
+    "resetting": "Resetting…",
+    "resetTooMany": "Already done several times this hour. Try again later."
   },
   "states": {
     "loading": "Loading",
@@ -443,6 +448,15 @@
       "cancel": "Cancel this order? If it was confirmed, the stock will be put back.",
       "markRefused": "Did the customer refuse the parcel?",
       "recordReturn": "Did the customer send the order back? The items will go back into stock."
+    }
+  },
+  "note": {
+    "save": "Save note",
+    "saved": "Note saved.",
+    "errors": {
+      "invalid": "A note is 500 characters at most.",
+      "forbidden": "Only the manager can edit notes.",
+      "notFound": "Not found. The demo may have been reset, reload the page."
     }
   }
 }

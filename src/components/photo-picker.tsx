@@ -14,7 +14,8 @@ type Photo = { key: string; url?: string; preview?: string; progress: number };
 type PhotoError = "type" | "size" | "count" | "failed";
 
 const tile = "relative aspect-square w-[88px] flex-none overflow-hidden rounded-lg lg:w-24";
-const corner = "absolute flex size-7 items-center justify-center rounded-full bg-surface/90 text-text shadow-sm";
+// Le rond fait 28 px à l'écran, sa zone touchable 44 px (le pseudo-élément déborde de 8 px de chaque côté).
+const corner = "absolute flex size-7 items-center justify-center rounded-full bg-surface/90 text-text shadow-sm after:absolute after:-inset-2";
 // Le voile de la maquette reste sombre en mode clair comme en mode sombre, le texte dessus reste blanc.
 const veil = "absolute inset-0 bg-[rgb(15_18_20/0.68)] text-white";
 
@@ -128,7 +129,8 @@ export function PhotoPicker({ initial, error, onBusyChange }: { initial: string[
       )}
       <div className="flex flex-wrap gap-2">
         {photos.length < MAX_PHOTOS && !batch && (
-          <label className={cx(tile, "flex cursor-pointer flex-col items-center justify-center gap-1.5 border border-dashed border-text-2 bg-surface px-2 text-center text-xs font-medium focus-within:outline-2 focus-within:outline-accent")}>
+          <label className={cx(tile.replace("aspect-square", ""), "flex min-h-[88px] cursor-pointer flex-col lg:min-h-24 items-center justify-center gap-1.5 border border-dashed border-text-2 bg-surface px-2 text-center text-xs font-medium focus-within:outline-2 focus-within:outline-accent")}>
+            {/* Une case carrée qui peut grandir en hauteur si le texte est agrandi. */}
             <CameraIcon aria-hidden size={22} />
             {t("addPhoto")}
             {/* Sans capture, le téléphone propose l'appareil photo ou la galerie. */}

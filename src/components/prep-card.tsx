@@ -81,7 +81,7 @@ export function PrepCard({
             {
               action: nextAction,
               look: primary ? "primary" : "secondary",
-              className: "h-12 w-full text-[15px]",
+              className: "min-h-12 w-full text-[15px]",
               label: (
                 <>
                   <CheckIcon aria-hidden size={18} />

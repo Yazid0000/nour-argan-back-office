@@ -8,7 +8,7 @@ export default function NotFound() {
   return (
     <div className="lg:px-10">
       <EmptyState icon={<CompassIcon size={28} />} title={t("notFound")}>
-        <Link href="/app" className={cx(buttonStyles.secondary, "mt-2 h-11")}>{t("notFoundLink")}</Link>
+        <Link href="/app" className={cx(buttonStyles.secondary, "mt-2 min-h-11")}>{t("notFoundLink")}</Link>
       </EmptyState>
     </div>
   );

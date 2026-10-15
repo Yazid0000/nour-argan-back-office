@@ -2,6 +2,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { CaretLeftIcon, MagnifyingGlassIcon, PhoneIcon, UsersIcon, WhatsappLogoIcon, XIcon } from "@phosphor-icons/react/ssr";
 import { Link } from "@/i18n/navigation";
 import { type CustomerFilter, getCustomer, listCustomers } from "@/lib/data";
+import { NoteForm } from "./note-form";
 import type { Segment } from "@/lib/domain";
 import { formatDay, formatWhen, moneyParts } from "@/lib/format";
 import { ActionBar, Chip, EmptyState, Money, Pill, StatusPill, type Tone, buttonStyles, cx, inputStyles } from "./ui";
@@ -206,23 +207,16 @@ export async function CustomerDetail({ id, backHref }: { id: string; backHref: s
         </section>
 
         <section>
-          <label htmlFor={`note-${c.id}`} className="mb-1.5 block text-[13px] text-text-2">{t("note")}</label>
-          <textarea
-            id={`note-${c.id}`}
-            defaultValue={c.note ?? ""}
-            placeholder={order("notePlaceholder")}
-            rows={2}
-            className="w-full rounded-lg border border-border bg-surface px-3.5 py-3 text-[15px] placeholder:text-text-2"
-          />
+          <NoteForm kind="customer" id={c.id} note={c.note} label={t("note")} placeholder={order("notePlaceholder")} labelClassName="text-[13px] text-text-2" />
         </section>
       </div>
 
       <ActionBar className="bg-surface lg:static">
-        <a href={tel} className={cx(buttonStyles.secondary, "h-12 text-[15px]")}>
+        <a href={tel} className={cx(buttonStyles.secondary, "min-h-12 text-[15px]")}>
           <PhoneIcon aria-hidden size={18} />
           {t("call")}
         </a>
-        <a href={wa} target="_blank" rel="noreferrer" className={cx(buttonStyles.primary, "h-12 flex-1 text-[15px]")}>
+        <a href={wa} target="_blank" rel="noreferrer" className={cx(buttonStyles.primary, "min-h-12 flex-1 text-[15px]")}>
           <WhatsappLogoIcon aria-hidden size={18} />
           {t("whatsapp")}
         </a>

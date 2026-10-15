@@ -47,7 +47,7 @@ export default async function TodayPage() {
   const salesTotal = d.daily.reduce((s, x) => s + x.total, 0);
 
   const handle = d.toConfirm > 0 && (
-    <Link href="/app/commandes" className={cx(buttonStyles.primary, "h-[52px] w-full text-base lg:h-11 lg:w-auto lg:text-[15px]")}>
+    <Link href="/app/commandes" className={cx(buttonStyles.primary, "min-h-[52px] w-full text-base lg:min-h-11 lg:w-auto lg:text-[15px]")}>
       {t("handle", { count: d.toConfirm })}
     </Link>
   );

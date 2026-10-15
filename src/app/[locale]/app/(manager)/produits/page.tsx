@@ -38,7 +38,7 @@ export default async function ProductsPage({ searchParams }: PageProps<"/[locale
         title={t("title")}
         action={
           <div className="hidden lg:block">
-            <Link href="/app/produits/nouveau" className={cx(buttonStyles.primary, "h-11 text-[15px]")}>
+            <Link href="/app/produits/nouveau" className={cx(buttonStyles.primary, "min-h-11 text-[15px]")}>
               <PlusIcon aria-hidden size={18} />
               {t("new")}
             </Link>

@@ -84,19 +84,20 @@ export function BottomTabs() {
         href={i.href}
         aria-current={active ? "page" : undefined}
         className={cx(
-          "flex min-h-[52px] flex-col items-center justify-center gap-1 text-xs",
+          "flex min-h-[52px] min-w-0 flex-col items-center justify-center gap-1 text-xs",
           active ? "font-semibold text-accent" : "font-medium text-text-2",
         )}
       >
         <i.icon aria-hidden size={22} weight={active ? "fill" : "regular"} />
-        {t(i.key)}
+        {/* Avec un texte très agrandi, le libellé se coupe au lieu de déborder sur l'onglet voisin. */}
+        <span className="max-w-full truncate px-0.5">{t(i.key)}</span>
       </Link>
     );
   };
   return (
     <nav
       aria-label={t("label")}
-      className="grid flex-none grid-cols-5 border-t border-border bg-surface px-1.5 pt-1.5 pb-[max(12px,env(safe-area-inset-bottom))] lg:hidden"
+      className="grid flex-none grid-cols-[1fr_1fr_3.5rem_1fr_1fr] border-t border-border bg-surface px-1.5 pt-1.5 pb-[max(12px,env(safe-area-inset-bottom))] lg:hidden"
     >
       {tabs.slice(0, 2).map(item)}
       <div className="flex items-center justify-center">

@@ -42,10 +42,10 @@ export function LoginForm() {
       </div>
 
       <div className="mt-auto flex flex-col gap-2.5 pt-10 lg:mt-8 lg:pt-0">
-        <button type="submit" name="demo" value="manager" disabled={pending} className={cx(buttonStyles.primary, "h-[52px] text-base")}>
+        <button type="submit" name="demo" value="manager" disabled={pending} className={cx(buttonStyles.primary, "min-h-[52px] text-base")}>
           {t("asManager")}
         </button>
-        <button type="submit" name="demo" value="preparer" disabled={pending} className={cx(buttonStyles.secondary, "h-[52px] text-base disabled:opacity-50")}>
+        <button type="submit" name="demo" value="preparer" disabled={pending} className={cx(buttonStyles.secondary, "min-h-[52px] text-base disabled:opacity-50")}>
           {t("asPreparer")}
         </button>
       </div>

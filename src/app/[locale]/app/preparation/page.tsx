@@ -94,7 +94,7 @@ export default async function PreparationPage({ searchParams }: PageProps<"/[loc
                     <OrderActionForm
                       orderId={o.id}
                       className="mt-2.5"
-                      buttons={[{ action: "markDelivered", label: action("markDelivered"), look: "outline", className: "h-11 w-full text-sm" }]}
+                      buttons={[{ action: "markDelivered", label: action("markDelivered"), look: "outline", className: "min-h-11 w-full text-sm" }]}
                     />
                   </ListItem>
                 );
@@ -116,7 +116,7 @@ export default async function PreparationPage({ searchParams }: PageProps<"/[loc
                 <dd className="font-display text-2xl font-semibold">{toPack!.itemsPacked}</dd>
               </div>
             </dl>
-            <Link href="/app/preparation" className={cx(buttonStyles.secondary, "h-11 self-start text-sm")}>
+            <Link href="/app/preparation" className={cx(buttonStyles.secondary, "min-h-11 self-start text-sm")}>
               <ArrowClockwiseIcon aria-hidden size={16} />
               {t("refresh")}
             </Link>

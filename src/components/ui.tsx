@@ -13,11 +13,11 @@ export function cx(...classes: (string | false | null | undefined)[]) {
 
 export const buttonStyles = {
   primary:
-    "inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-[18px] font-semibold text-accent-fg active:scale-[0.98] disabled:opacity-50",
+    "inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-[18px] py-2 text-center leading-snug font-semibold text-accent-fg active:scale-[0.98] disabled:opacity-50",
   secondary:
-    "inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 font-medium active:scale-[0.98]",
+    "inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-center leading-snug font-medium active:scale-[0.98]",
   outline:
-    "inline-flex items-center justify-center gap-2 rounded-lg border border-accent px-4 font-semibold text-accent active:scale-[0.98]",
+    "inline-flex items-center justify-center gap-2 rounded-lg border border-accent px-4 py-2 text-center leading-snug font-semibold text-accent active:scale-[0.98]",
 };
 
 export type Tone = "ok" | "warn" | "err" | "neutral" | "info";
